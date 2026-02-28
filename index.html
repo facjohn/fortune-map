@@ -8,460 +8,368 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-/* ═══════════ THEME ═══════════ */
-:root {
-  --pri:#6B4EFF; --pri-g:rgba(107,78,255,0.25); --saju:#E85D3A; --sinjeom:#2DB67D; --tarot:#3B82F6; --gwan:#F59E0B;
-  --bg:#FFFFFF; --bg2:#F8FAFC; --bg3:#F1F5F9; --surf:#FFFFFF;
-  --tx:#0F172A; --tx2:#475569; --sub:#64748B; --mu:#94A3B8;
-  --bd:#F1F5F9; --bd2:#E2E8F0; --red:#EF4444; --gold:#FACC15;
-  --sh:0 2px 8px rgba(0,0,0,0.06); --overlay:rgba(0,0,0,0.5);
-}
-[data-theme="dark"] {
-  --pri:#9B85FF; --pri-g:rgba(155,133,255,0.35);
-  --bg:#0A0D1C; --bg2:#0F1328; --bg3:#171C38; --surf:#111530;
-  --tx:#E4E2F0; --tx2:#A09CC0; --sub:#706C98; --mu:#504C78;
-  --bd:#1A1F3A; --bd2:#252B50; --sh:0 2px 12px rgba(0,0,0,0.4); --overlay:rgba(4,4,16,0.88);
-}
-[data-theme="dark"] .leaflet-tile-pane{filter:brightness(0.6) contrast(1.15) saturate(0.7) hue-rotate(210deg);}
+:root{--pri:#6B4EFF;--saju:#E85D3A;--sinj:#2DB67D;--taro:#3B82F6;--gwan:#F59E0B;--bg:#fff;--bg2:#F8FAFC;--bg3:#F1F5F9;--sf:#fff;--tx:#0F172A;--tx2:#475569;--sub:#64748B;--mu:#94A3B8;--bd:#F1F5F9;--bd2:#E2E8F0;--red:#EF4444;--sh:0 2px 8px rgba(0,0,0,.06);--ov:rgba(0,0,0,.5);}
+[data-theme="dark"]{--pri:#9B85FF;--bg:#0A0D1C;--bg2:#0F1328;--bg3:#171C38;--sf:#111530;--tx:#E4E2F0;--tx2:#A09CC0;--sub:#706C98;--mu:#504C78;--bd:#1A1F3A;--bd2:#252B50;--sh:0 2px 12px rgba(0,0,0,.4);--ov:rgba(4,4,16,.88);}
+[data-theme="dark"] .leaflet-tile-pane{filter:brightness(.6) contrast(1.15) saturate(.7) hue-rotate(210deg);}
 [data-theme="dark"] .leaflet-control-zoom a{background:var(--bg3)!important;color:var(--tx)!important;border-color:var(--bd2)!important;}
-
-/* ═══════════ RESET ═══════════ */
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard',-apple-system,sans-serif;}
 html,body{height:100%;width:100%;overflow:hidden;background:#0A0D1C;}
 body{display:flex;justify-content:center;}
 ::-webkit-scrollbar{width:0;height:0;}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;max-width:480px;background:var(--bg);position:relative;box-shadow:0 0 40px rgba(0,0,0,.2);overflow:hidden;transition:background .35s;}
 
-/* ═══════════ APP SHELL ═══════════ */
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;max-width:480px;background:var(--bg);position:relative;box-shadow:0 0 40px rgba(0,0,0,0.2);overflow:hidden;transition:background .35s;}
+.hd{height:50px;min-height:50px;padding:0 16px;background:var(--sf);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bd);z-index:100;transition:all .35s;}
+.hd-t{font-size:19px;font-weight:800;background:linear-gradient(135deg,var(--pri),#E85D3A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hd-u{font-size:12px;color:var(--pri);font-weight:600;margin-left:auto;}
+.thm{background:none;border:none;font-size:20px;cursor:pointer;padding:6px;border-radius:8px;line-height:1;}
 
-/* Header */
-.hd{height:48px;min-height:48px;padding:0 16px;background:var(--surf);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bd);z-index:100;transition:all .35s;}
-.hd-logo{font-size:20px;}
-.hd-title{font-size:17px;font-weight:800;background:linear-gradient(135deg,var(--pri),#E85D3A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.hd-user{font-size:10px;color:var(--pri);font-weight:600;margin-left:auto;}
-.theme-btn{background:none;border:none;font-size:18px;cursor:pointer;padding:6px;border-radius:8px;transition:.2s;line-height:1;}
-.theme-btn:active{transform:scale(0.9);}
-
-/* Bottom Nav */
-.bnav{height:56px;min-height:56px;background:var(--surf);border-top:1px solid var(--bd);display:flex;justify-content:space-around;align-items:center;z-index:100;transition:all .35s;}
-.nv{display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--sub);font-size:9px;font-weight:500;cursor:pointer;background:none;border:none;position:relative;transition:color .2s;padding:4px 12px;}
+.bnav{height:58px;min-height:58px;background:var(--sf);border-top:1px solid var(--bd);display:flex;justify-content:space-around;align-items:center;z-index:100;transition:all .35s;}
+.nv{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--sub);font-size:11px;font-weight:500;cursor:pointer;background:none;border:none;position:relative;padding:4px 14px;}
 .nv.on{color:var(--pri);font-weight:700;}
-.nv-ic{font-size:18px;}
-.nv-badge{position:absolute;top:0;right:4px;background:var(--red);color:#fff;font-size:7px;font-weight:700;min-width:13px;height:13px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.nv-ic{font-size:20px;}
+.nv-bg{position:absolute;top:0;right:4px;background:var(--red);color:#fff;font-size:8px;font-weight:700;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
 
-/* Main Content Area */
-.content{flex:1 1 0;min-height:0;position:relative;overflow:hidden;}
-.vw{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}
-.vw.on{display:flex;}
+.ct{flex:1 1 0;min-height:0;position:relative;overflow:hidden;}
+.vw{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}.vw.on{display:flex;}
 
-/* ═══════════ MAP VIEW ═══════════ */
-.filters{background:var(--surf);border-bottom:1px solid var(--bd);flex-shrink:0;transition:all .35s;}
-.frow{display:flex;gap:5px;padding:6px 10px 2px;overflow-x:auto;white-space:nowrap;}
-.frow:last-child{padding-bottom:6px;}
-.fb{padding:5px 12px;border-radius:18px;border:none;font-size:10px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--sub);transition:all .15s;flex-shrink:0;}
-.fb.on{color:#fff;}
-.rb,.pb{padding:4px 9px;border-radius:7px;border:1px solid var(--bd2);background:var(--surf);color:var(--sub);font-size:9px;font-weight:600;cursor:pointer;flex-shrink:0;transition:all .15s;}
-.rb.on{background:var(--tx);color:var(--bg);border-color:var(--tx);}
-.pb.on{background:var(--pri);color:#fff;border-color:var(--pri);}
+/* FILTERS */
+.flt{background:var(--sf);border-bottom:1px solid var(--bd);flex-shrink:0;transition:all .35s;padding:6px 10px 4px;}
+.frow{display:flex;gap:5px;margin-bottom:4px;overflow-x:auto;white-space:nowrap;}
+/* 2-row region grid */
+.rgrid{display:flex;flex-wrap:wrap;gap:4px 5px;margin-bottom:4px;}
+.fb{padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--sub);transition:all .15s;flex-shrink:0;}.fb.on{color:#fff;}
+.rb{padding:5px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf);color:var(--sub);font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;transition:all .15s;}.rb.on{background:var(--tx);color:var(--bg);border-color:var(--tx);}
+.pb{padding:5px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf);color:var(--sub);font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;transition:all .15s;}.pb.on{background:var(--pri);color:#fff;border-color:var(--pri);}
 
-/* ★★★ MAP CONTAINER - THE FIX ★★★ */
-.map-area{flex:1 1 0;min-height:0;position:relative;}
+/* MAP */
+.ma{flex:1 1 0;min-height:0;position:relative;}
 #map{position:absolute;top:0;left:0;width:100%;height:100%;}
-.map-badge{position:absolute;top:8px;left:8px;background:var(--surf);border-radius:8px;padding:6px 10px;box-shadow:var(--sh);z-index:500;font-size:11px;font-weight:700;color:var(--tx);pointer-events:none;border:1px solid var(--bd);transition:all .35s;}
-
-/* Popup */
-.leaflet-popup-content-wrapper{border-radius:12px!important;padding:0!important;box-shadow:0 4px 20px rgba(0,0,0,0.15)!important;border:1px solid var(--bd2)!important;background:var(--surf)!important;}
-.leaflet-popup-content{margin:0!important;width:auto!important;min-width:220px;max-width:270px;}
+.mbg{position:absolute;top:8px;left:8px;background:var(--sf);border-radius:10px;padding:7px 12px;box-shadow:var(--sh);z-index:500;font-size:13px;font-weight:700;color:var(--tx);pointer-events:none;border:1px solid var(--bd);transition:all .35s;}
+.leaflet-popup-content-wrapper{border-radius:14px!important;padding:0!important;box-shadow:0 4px 20px rgba(0,0,0,.15)!important;border:1px solid var(--bd2)!important;background:var(--sf)!important;}
+.leaflet-popup-content{margin:0!important;width:auto!important;min-width:230px;max-width:280px;}
 .leaflet-popup-tip{display:none;}
-.custom-marker{border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,0.3);border:2.5px solid #fff;cursor:pointer;transition:transform .2s;}
-.custom-marker:hover{transform:scale(1.15);}
+.cm{border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.3);border:2.5px solid #fff;cursor:pointer;transition:transform .2s;}.cm:hover{transform:scale(1.15);}
 
-/* ═══════════ SEARCH ═══════════ */
-.s-wrap{padding:12px;background:var(--surf);border-bottom:1px solid var(--bd);flex-shrink:0;transition:all .35s;}
-.s-in{width:100%;padding:10px 14px;border:2px solid var(--pri);border-radius:10px;font-size:13px;font-weight:600;outline:none;background:var(--bg2);color:var(--tx);transition:all .35s;}
-.s-tag{padding:5px 11px;background:var(--bg2);border:1px solid var(--bd);border-radius:18px;font-size:11px;cursor:pointer;display:inline-block;margin:0 4px 6px 0;color:var(--tx);transition:all .2s;}
-.s-tag:active{background:var(--pri);color:#fff;}
-.si{padding:11px 14px;border-bottom:1px solid var(--bd);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s;}
+/* BADGES */
+.vb{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:700;color:#059669;background:#ECFDF5;padding:2px 8px;border-radius:8px;white-space:nowrap;}
+[data-theme="dark"] .vb{background:#0D2818;color:#34D399;}
+.rvb{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:700;color:var(--pri);background:#EDE9FE;padding:2px 7px;border-radius:7px;}
+[data-theme="dark"] .rvb{background:#1A1540;color:#A78BFA;}
+
+/* SEARCH */
+.sw{padding:12px;background:var(--sf);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.sinp{width:100%;padding:11px 16px;border:2px solid var(--pri);border-radius:12px;font-size:15px;font-weight:600;outline:none;background:var(--bg2);color:var(--tx);transition:all .35s;}
+.stag{padding:6px 13px;background:var(--bg2);border:1px solid var(--bd);border-radius:20px;font-size:13px;cursor:pointer;display:inline-block;margin:0 5px 7px 0;color:var(--tx);}
+.si{padding:13px 14px;border-bottom:1px solid var(--bd);cursor:pointer;display:flex;align-items:center;gap:12px;}
 .si:active{background:var(--bg2);}
-.si-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.si-ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 
-/* ═══════════ BADGES ═══════════ */
-.v-badge{display:inline-flex;align-items:center;gap:2px;font-size:9px;font-weight:700;color:#059669;background:#ECFDF5;padding:2px 7px;border-radius:8px;white-space:nowrap;}
-[data-theme="dark"] .v-badge{background:#0D2818;color:#34D399;}
-.rv-badge{display:inline-flex;align-items:center;gap:2px;font-size:8px;font-weight:700;color:var(--pri);background:#EDE9FE;padding:2px 6px;border-radius:6px;}
-[data-theme="dark"] .rv-badge{background:#1A1540;color:#A78BFA;}
+/* CARDS */
+.wc{margin:0 14px 10px;background:var(--sf);border-radius:14px;padding:14px;border:1px solid var(--bd);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .35s;}
+.rc{background:var(--sf);border-radius:14px;padding:16px;margin:0 14px 10px;border:1px solid var(--bd);transition:all .35s;}
+.pc{margin:0 14px 10px;background:var(--sf);border-radius:12px;padding:14px;border:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;transition:all .35s;}
+.rs{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;}
+.rs.active{background:#EFF6FF;color:var(--pri);}[data-theme="dark"] .rs.active{background:#151A40;}
+.rs.completed{background:var(--bg3);color:var(--sub);}
+.rs.cancelled{background:#FEF2F2;color:var(--red);}[data-theme="dark"] .rs.cancelled{background:#200F15;}
 
-/* ═══════════ CARDS ═══════════ */
-.wcard{margin:0 12px 8px;background:var(--surf);border-radius:12px;padding:12px;border:1px solid var(--bd);display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .35s;}
-.rcard{background:var(--surf);border-radius:12px;padding:14px;margin:0 12px 8px;border:1px solid var(--bd);transition:all .35s;}
-.pcard{margin:0 12px 8px;background:var(--surf);border-radius:10px;padding:12px;border:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;transition:all .35s;}
-.rstatus{padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;}
-.rstatus.active{background:#EFF6FF;color:var(--pri);}[data-theme="dark"] .rstatus.active{background:#151A40;}
-.rstatus.completed{background:var(--bg3);color:var(--sub);}
-.rstatus.cancelled{background:#FEF2F2;color:var(--red);}[data-theme="dark"] .rstatus.cancelled{background:#200F15;}
+/* LOGIN */
+.sb{width:100%;max-width:320px;padding:14px;border-radius:12px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;cursor:pointer;border:none;transition:.15s;}
+.sb:active{transform:scale(.97);}
+.sn{background:#03C75A;color:#fff;}.sk{background:#FEE500;color:#000;}.sg{background:var(--sf);color:var(--tx);border:1px solid var(--bd2);}.sa{background:#000;color:#fff;}
 
-/* ═══════════ SOCIAL LOGIN ═══════════ */
-.sbtn{width:100%;max-width:300px;padding:13px;border-radius:10px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;cursor:pointer;border:none;transition:.15s;}
-.sbtn:active{transform:scale(0.97);}
-.sn{background:#03C75A;color:#fff;}.sk{background:#FEE500;color:#000;}.sg{background:var(--surf);color:var(--tx);border:1px solid var(--bd2);}.sa{background:#000;color:#fff;}
-
-/* ═══════════ MODAL ═══════════ */
-#mo{position:fixed;inset:0;background:var(--overlay);z-index:1000;display:none;align-items:flex-end;justify-content:center;}
+/* MODAL */
+#mo{position:fixed;inset:0;background:var(--ov);z-index:1000;display:none;align-items:flex-end;justify-content:center;}
 #mo.on{display:flex;}
-.mc{background:var(--surf);width:100%;max-width:480px;max-height:88vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;animation:mup .25s ease-out;transition:background .35s;}
-@keyframes mup{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.mh{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);gap:6px;transition:all .35s;}
-.mh .mt{flex:1;text-align:center;font-size:14px;font-weight:800;color:var(--tx);}
-.cbtn{background:var(--bg3);border:none;border-radius:50%;width:30px;height:30px;font-size:13px;cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.fbtn2{background:none;border:none;font-size:20px;cursor:pointer;}
+.mc{background:var(--sf);width:100%;max-width:480px;max-height:88vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:mu .25s ease-out;transition:background .35s;}
+@keyframes mu{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mh{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bd);gap:8px;}
+.mh .mt{flex:1;text-align:center;font-size:16px;font-weight:800;color:var(--tx);}
+.cb{background:var(--bg3);border:none;border-radius:50%;width:32px;height:32px;font-size:14px;cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;}
+.fvb{background:none;border:none;font-size:22px;cursor:pointer;}
 .mb{flex:1;overflow-y:auto;background:var(--bg);transition:background .35s;}
-.mf{padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:6px;background:var(--surf);transition:all .35s;}
-.btn{flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;border:none;transition:.15s;}
-.btn:active{transform:scale(0.97);}
+.mf{padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:8px;background:var(--sf);}
+.btn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;border:none;transition:.15s;}
+.btn:active{transform:scale(.97);}
 .btn-o{background:var(--bg2);color:var(--tx);border:1px solid var(--bd2);}
 .btn-b{background:#000;color:#fff;}[data-theme="dark"] .btn-b{background:var(--pri);color:#fff;}
 
-/* ═══════════ GALLERY ═══════════ */
-.gal{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;}
-.gal img{width:110px;height:82px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd2);cursor:pointer;transition:transform .2s;}
-.gal img:hover{transform:scale(1.03);}
+/* GALLERY */
+.gal{display:flex;gap:8px;padding:0 18px 14px;overflow-x:auto;}.gal img{width:120px;height:88px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd2);cursor:pointer;transition:transform .2s;}.gal img:hover{transform:scale(1.03);}
 
-/* ═══════════ DETAIL BLOCKS ═══════════ */
-.igrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 16px 12px;}
-.iitem{background:var(--bg2);border-radius:8px;padding:10px;transition:all .35s;}
-.iitem .il{font-size:9px;color:var(--mu);margin-bottom:1px;}
-.iitem .iv{font-size:11px;font-weight:600;color:var(--tx);}
-.abox{display:flex;align-items:center;background:var(--bg2);padding:10px 12px;border-radius:8px;margin:0 16px 12px;border:1px solid var(--bd2);gap:6px;transition:all .35s;}
-.cpbtn{background:var(--surf);border:1px solid var(--bd2);padding:4px 8px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;color:var(--sub);white-space:nowrap;transition:all .2s;}
-.tag{font-size:9px;color:var(--sub);background:var(--bg3);padding:3px 8px;border-radius:6px;display:inline-block;margin:0 3px 3px 0;transition:all .35s;}
-.rvcard{background:var(--bg2);border-radius:8px;padding:11px;margin-bottom:6px;transition:all .35s;}
+/* DETAIL */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 18px 14px;}
+.ii{background:var(--bg2);border-radius:10px;padding:12px;transition:all .35s;}
+.il{font-size:11px;color:var(--mu);margin-bottom:2px;}.iv{font-size:13px;font-weight:600;color:var(--tx);}
+.ab{display:flex;align-items:center;background:var(--bg2);padding:11px 14px;border-radius:10px;margin:0 18px 14px;border:1px solid var(--bd2);gap:8px;}
+.cpb{background:var(--sf);border:1px solid var(--bd2);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:var(--sub);white-space:nowrap;}
+.tg{font-size:11px;color:var(--sub);background:var(--bg3);padding:4px 10px;border-radius:8px;display:inline-block;margin:0 4px 4px 0;}
+.rvc{background:var(--bg2);border-radius:10px;padding:13px;margin-bottom:8px;transition:all .35s;}
 
-/* ═══════════ CALENDAR ═══════════ */
-.cal-h{display:flex;justify-content:space-between;align-items:center;padding:0 16px;margin-bottom:10px;}
-.cal-n{background:none;border:none;font-size:16px;color:var(--pri);cursor:pointer;padding:4px 10px;}
-.cal-m{font-size:14px;font-weight:700;color:var(--tx);}
-.cal-w{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10px;font-weight:600;color:var(--mu);margin-bottom:4px;padding:0 16px;}
-.cal-d{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0;text-align:center;padding:0 16px;margin-bottom:12px;}
-.cd{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;transition:.15s;margin:0 auto;color:var(--tx);}
-.cd.today{color:var(--red);font-weight:700;}.cd.sel{background:var(--pri);color:#fff;font-weight:700;}
-.cd.dis{color:var(--mu);cursor:not-allowed;text-decoration:line-through;}
-.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 16px 12px;}
-.tbtn{padding:10px;border:1px solid var(--bd2);border-radius:8px;background:var(--surf);font-size:12px;font-weight:600;cursor:pointer;text-align:center;color:var(--tx);transition:.15s;}
-.tbtn.on{background:var(--pri);color:#fff;border-color:var(--pri);}
-.bform{padding:0 16px 16px;display:none;}.bform.on{display:block;}
-.finp{width:100%;padding:10px;border:1px solid var(--bd2);border-radius:8px;margin-bottom:6px;font-size:12px;outline:none;background:var(--bg2);color:var(--tx);transition:all .35s;}
+/* REVIEW FORM */
+.rv-form{background:var(--bg2);border-radius:12px;padding:16px;margin:0 18px 14px;border:1px solid var(--bd2);}
+.rv-stars-sel{display:flex;gap:4px;margin-bottom:10px;}
+.rv-star{font-size:28px;cursor:pointer;background:none;border:none;padding:0;transition:transform .15s;}
+.rv-star:hover{transform:scale(1.2);}
+.rv-ta{width:100%;padding:12px;border:1px solid var(--bd2);border-radius:10px;font-size:14px;outline:none;background:var(--sf);color:var(--tx);resize:none;min-height:80px;transition:all .35s;font-family:inherit;}
+.rv-submit{width:100%;padding:12px;border-radius:10px;border:none;background:var(--pri);color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;}
 
-/* ═══════════ TOAST ═══════════ */
-#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx);color:var(--bg);padding:9px 20px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;}
+/* CALENDAR */
+.cal-h{display:flex;justify-content:space-between;align-items:center;padding:0 18px;margin-bottom:10px;}
+.cal-n{background:none;border:none;font-size:18px;color:var(--pri);cursor:pointer;padding:4px 12px;}
+.cal-m{font-size:16px;font-weight:700;color:var(--tx);}
+.cal-w{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;font-weight:600;color:var(--mu);margin-bottom:6px;padding:0 18px;}
+.cal-d{display:grid;grid-template-columns:repeat(7,1fr);gap:3px 0;text-align:center;padding:0 18px;margin-bottom:14px;}
+.cd{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:.15s;margin:0 auto;color:var(--tx);}
+.cd.today{color:var(--red);font-weight:700;}.cd.sel{background:var(--pri);color:#fff;font-weight:700;}.cd.dis{color:var(--mu);cursor:not-allowed;text-decoration:line-through;}
+.tgd{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 18px 14px;}
+.tb{padding:11px;border:1px solid var(--bd2);border-radius:10px;background:var(--sf);font-size:14px;font-weight:600;cursor:pointer;text-align:center;color:var(--tx);transition:.15s;}.tb.on{background:var(--pri);color:#fff;border-color:var(--pri);}
+.bf{padding:0 18px 18px;display:none;}.bf.on{display:block;}
+.fi{width:100%;padding:12px;border:1px solid var(--bd2);border-radius:10px;margin-bottom:8px;font-size:14px;outline:none;background:var(--bg2);color:var(--tx);transition:all .35s;}
+
+/* TOAST */
+#toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx);color:var(--bg);padding:10px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* Stars helper */
 .st{color:#FACC15;}.sto{color:var(--mu);}
 </style>
 </head>
 <body>
 <div id="app" data-theme="light">
-  <!-- HEADER -->
-  <div class="hd">
-    <span class="hd-logo">🔮</span>
-    <span class="hd-title">운명지도</span>
-    <span class="hd-user" id="hd-user"></span>
-    <button class="theme-btn" id="thm">🌙</button>
-  </div>
-
-  <!-- CONTENT -->
-  <div class="content">
-    <!-- MAP VIEW -->
+  <div class="hd"><span style="font-size:22px">🔮</span><span class="hd-t">운명지도</span><div style="flex:1"></div><span class="hd-u" id="hu"></span><button class="thm" id="thm">🌙</button></div>
+  <div class="ct">
     <div id="v-map" class="vw on">
-      <div class="filters">
+      <div class="flt">
         <div class="frow" id="fc"></div>
-        <div class="frow" id="fr"></div>
+        <div class="rgrid" id="fr"></div>
         <div class="frow" id="fp"></div>
       </div>
-      <div class="map-area">
-        <div id="map"></div>
-        <div class="map-badge" id="mbadge"></div>
-      </div>
+      <div class="ma"><div id="map"></div><div class="mbg" id="mbg"></div></div>
     </div>
-    <!-- SEARCH VIEW -->
     <div id="v-search" class="vw" style="overflow-y:auto;background:var(--bg);">
-      <div class="s-wrap"><input type="text" id="sinp" class="s-in" placeholder="점술인, 지역, 카테고리 검색..."></div>
-      <div id="shist" style="padding:14px;"></div>
-      <div id="sres" style="display:none;"></div>
+      <div class="sw"><input type="text" id="sinp" class="sinp" placeholder="점술인, 지역, 카테고리 검색..."></div>
+      <div id="shist" style="padding:14px"></div><div id="sres" style="display:none"></div>
     </div>
-    <!-- WISHLIST -->
-    <div id="v-wish" class="vw" style="overflow-y:auto;background:var(--bg2);"></div>
-    <!-- MY -->
-    <div id="v-my" class="vw" style="overflow-y:auto;background:var(--bg2);"></div>
+    <div id="v-wish" class="vw" style="overflow-y:auto;background:var(--bg2)"></div>
+    <div id="v-my" class="vw" style="overflow-y:auto;background:var(--bg2)"></div>
   </div>
-
-  <!-- BOTTOM NAV -->
   <div class="bnav" id="bnav"></div>
-
-  <!-- MODAL -->
   <div id="mo"><div class="mc">
-    <div class="mh">
-      <button class="cbtn" id="mback" style="display:none">←</button>
-      <div class="mt" id="mtitle"></div>
-      <button class="fbtn2" id="mfav">🤍</button>
-      <button class="cbtn" id="mclose">✕</button>
-    </div>
-    <div class="mb" id="mbody"></div>
-    <div class="mf" id="mfoot"></div>
+    <div class="mh"><button class="cb" id="mback" style="display:none">←</button><div class="mt" id="mtitle"></div><button class="fvb" id="mfav">🤍</button><button class="cb" id="mcl">✕</button></div>
+    <div class="mb" id="mbody"></div><div class="mf" id="mfoot"></div>
   </div></div>
-
   <div id="toast"></div>
 </div>
-
 <script>
-// ═══════════════════════════════════
-//  DATA
-// ═══════════════════════════════════
+// ═══════ DATA ═══════
 const CT={saju:{l:"사주",c:"#E85D3A",bg:"#FDF2EE",db:"#2A1A14"},sinjeom:{l:"신점",c:"#2DB67D",bg:"#EAF7F2",db:"#0D2818"},tarot:{l:"타로",c:"#3B82F6",bg:"#EBF2FE",db:"#0F1A30"},gwansang:{l:"관상",c:"#F59E0B",bg:"#FEF3C7",db:"#2A2414"}};
 const CL=[{id:"all",l:"전체",ic:"✦",c:"#6B4EFF"},{id:"saju",l:"사주",ic:"☰",c:"#E85D3A"},{id:"sinjeom",l:"신점",ic:"🔮",c:"#2DB67D"},{id:"tarot",l:"타로",ic:"🃏",c:"#3B82F6"},{id:"gwansang",l:"관상",ic:"👁️",c:"#F59E0B"}];
-const RG=["전국","서울","경기","부산","대구","광주","대전","전주","강원","제주","울산","인천"];
-const PR=[{l:"전체",a:0,b:9e6},{l:"~1만",a:0,b:10000},{l:"1~3만",a:10001,b:30000},{l:"3~5만",a:30001,b:50000},{l:"5~7만",a:50001,b:70000},{l:"7~10만",a:70001,b:100000},{l:"10만~",a:100001,b:9e6}];
+const RG=["전국","서울","경기","부산","대구","인천","광주","대전","전주","강원","제주","울산","충북","충남","경북","경남","전남"];
+// 가격 경계: 이상 ~ 미만 (겹침 없음)
+const PR=[{l:"전체",a:0,b:1e8},{l:"1만 미만",a:0,b:10000},{l:"1~3만",a:10000,b:30000},{l:"3~5만",a:30000,b:50000},{l:"5~7만",a:50000,b:70000},{l:"7~10만",a:70000,b:100000},{l:"10만 이상",a:100000,b:1e8}];
 
-// Photos: royalty-free placeholder images for interior/ambience
-const PH={
-  a:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=300&h=200&fit=crop"],
-  b:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=300&h=200&fit=crop"],
-  c:["https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=200&fit=crop"],
-  d:["https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=300&h=200&fit=crop"],
-  e:[]
-};
+const PH={a:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop"],b:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=300&h=200&fit=crop"],c:["https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=200&fit=crop"],d:["https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=300&h=200&fit=crop"],e:[]};
 
-const P=[
-  {id:1,n:"천운당",cat:"saju",rg:"서울",lat:37.5715,lng:126.986,addr:"서울 종로구 인사동길 42",rt:9.2,rv:847,pr:60000,prl:"6만원",sp:"김천운",exp:"32년",desc:"3대째 이어온 전통 사주 명가. 정확한 사주풀이와 따뜻한 상담으로 유명합니다. 기업 대표, 정치인 등 VIP 고객이 많습니다.",tags:["정확함","친절","예약필수"],ph:"02-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🏛️",vf:true,photos:PH.a},
-  {id:2,n:"명리학당",cat:"saju",rg:"서울",lat:37.5013,lng:127.0396,addr:"서울 강남구 테헤란로 156",rt:8.8,rv:623,pr:70000,prl:"7만원",sp:"박명리",exp:"25년",desc:"현대적 감각의 사주 해석. 직장인과 사업가 고객 다수.",tags:["사업운","재물운","직장운"],ph:"02-2345-6789",hrs:"11:00-21:00",cls:"월요일",ic:"📖",vf:true,photos:PH.b},
-  {id:3,n:"신령당",cat:"sinjeom",rg:"서울",lat:37.5568,lng:126.9106,addr:"서울 마포구 망원동 72-3",rt:9.5,rv:1203,pr:120000,prl:"12만원",sp:"신령보살",exp:"40년",desc:"전국에서 찾아오는 용한 무당. 신내림 후 40년간 한결같은 적중률. TV 방송 다수 출연.",tags:["용하다","소름","신기함"],ph:"02-3456-7890",hrs:"09:00-18:00",cls:"수요일",ic:"🔮",vf:true,photos:PH.c},
-  {id:4,n:"달빛타로",cat:"tarot",rg:"서울",lat:37.5563,lng:126.9237,addr:"서울 홍대입구 어울마당로 52",rt:8.5,rv:456,pr:30000,prl:"3만원",sp:"Luna",exp:"8년",desc:"감성적인 공간에서 타로 리딩. 연애운, 진로 상담에 특화.",tags:["감성적","연애운","분위기좋음"],ph:"02-4567-8901",hrs:"13:00-22:00",cls:"화요일",ic:"🌙",vf:false,photos:PH.b},
-  {id:5,n:"해운보살",cat:"sinjeom",rg:"부산",lat:35.1587,lng:129.1601,addr:"부산 해운대구 중동 1543",rt:9.7,rv:2105,pr:80000,prl:"8만원",sp:"해운보살",exp:"45년",desc:"부산 최고의 신점. 해운대에서 45년간 한자리를 지킨 전설.",tags:["전설","정확함","줄서서감"],ph:"051-1234-5678",hrs:"08:00-17:00",cls:"일요일",ic:"🌊",vf:true,photos:PH.a},
-  {id:6,n:"팔공산 도사",cat:"saju",rg:"대구",lat:35.8714,lng:128.6014,addr:"대구 동구 팔공산로 185",rt:8.9,rv:534,pr:50000,prl:"5만원",sp:"팔공도사",exp:"35년",desc:"팔공산 자락에서 수행한 도사님.",tags:["산속","수행자","도사"],ph:"053-1234-5678",hrs:"10:00-16:00",cls:"토,일",ic:"⛰️",vf:true,photos:PH.d},
-  {id:7,n:"빛고을 타로",cat:"tarot",rg:"광주",lat:35.146,lng:126.9186,addr:"광주 동구 충장로 87",rt:8.3,rv:312,pr:25000,prl:"2.5만원",sp:"별이",exp:"6년",desc:"광주 핫플 타로샵. SNS 입소문.",tags:["핫플","SNS유명","가성비"],ph:"062-1234-5678",hrs:"12:00-21:00",cls:"월요일",ic:"✨",vf:false,photos:PH.d},
-  {id:8,n:"은하수 사주",cat:"saju",rg:"대전",lat:36.3504,lng:127.3845,addr:"대전 서구 둔산동 1587",rt:8.6,rv:289,pr:40000,prl:"4만원",sp:"은하선생",exp:"20년",desc:"과학적이고 논리적인 사주 해석.",tags:["논리적","과학적","꼼꼼함"],ph:"042-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🌌",vf:true,photos:PH.d},
-  {id:9,n:"제주 해신당",cat:"sinjeom",rg:"제주",lat:33.394,lng:126.2396,addr:"제주 한림읍 협재리",rt:9.1,rv:678,pr:70000,prl:"7만원",sp:"해신보살",exp:"30년",desc:"제주 바다의 기운을 받은 강력한 신점.",tags:["제주여행","바다기운"],ph:"064-1234-5678",hrs:"09:00-17:00",cls:"수요일",ic:"🏝️",vf:true,photos:PH.c},
-  {id:10,n:"춘천 달타로",cat:"tarot",rg:"강원",lat:37.8813,lng:127.7298,addr:"춘천시 명동길 24",rt:8.1,rv:198,pr:20000,prl:"2만원",sp:"달빛",exp:"5년",desc:"아늑한 타로카페.",tags:["카페","아늑함","차포함"],ph:"033-1234-5678",hrs:"11:00-20:00",cls:"화요일",ic:"🍵",vf:false,photos:PH.e},
-  {id:11,n:"수원 점술관",cat:"saju",rg:"경기",lat:37.2886,lng:127.0015,addr:"수원 팔달구 화성행궁로 21",rt:8.4,rv:345,pr:45000,prl:"4.5만원",sp:"화성도사",exp:"22년",desc:"수원화성 근처 전통 점술관.",tags:["전통","관광지"],ph:"031-1234-5678",hrs:"10:00-18:00",cls:"월요일",ic:"🏯",vf:true,photos:PH.d},
-  {id:12,n:"한옥 신점",cat:"sinjeom",rg:"전주",lat:35.8151,lng:127.153,addr:"전주 한옥마을길 55",rt:9.0,rv:567,pr:60000,prl:"6만원",sp:"한옥보살",exp:"28년",desc:"한옥마을에서 전통 방식의 신점.",tags:["한옥마을","전통방식"],ph:"063-1234-5678",hrs:"09:00-18:00",cls:"일요일",ic:"🏡",vf:true,photos:PH.b},
-  {id:13,n:"울산 태화",cat:"saju",rg:"울산",lat:35.5537,lng:129.3114,addr:"울산 중구 태화동",rt:8.2,rv:210,pr:40000,prl:"4만원",sp:"태화선생",exp:"18년",desc:"태화강변 사주 상담.",tags:["조용함","강변"],ph:"052-1234-5678",hrs:"10:00-18:00",cls:"토요일",ic:"🌿",vf:false,photos:PH.e},
-  {id:14,n:"강릉 동해 점집",cat:"sinjeom",rg:"강원",lat:37.796,lng:128.896,addr:"강릉시 경포로 398",rt:8.7,rv:401,pr:50000,prl:"5만원",sp:"동해보살",exp:"33년",desc:"동해 기운의 용한 점집.",tags:["동해기운","경포대"],ph:"033-2345-6789",hrs:"08:00-17:00",cls:"일요일",ic:"🌅",vf:true,photos:PH.d},
-  {id:15,n:"종로 백운관상",cat:"gwansang",rg:"서울",lat:37.57,lng:126.983,addr:"서울 종로구 관철동 14-5",rt:9.0,rv:389,pr:50000,prl:"5만원",sp:"백운선생",exp:"28년",desc:"인상학의 대가. TV 방송 다수 출연.",tags:["관상명인","정확함","TV출연"],ph:"02-5678-1234",hrs:"10:00-18:00",cls:"일요일",ic:"🎭",vf:true,photos:PH.c},
-  {id:16,n:"서면 얼굴명가",cat:"gwansang",rg:"부산",lat:35.153,lng:129.0596,addr:"부산 서면로 68",rt:8.7,rv:267,pr:40000,prl:"4만원",sp:"김관상",exp:"15년",desc:"MZ세대 인기 관상 풀이.",tags:["MZ인기","현대적"],ph:"051-5678-1234",hrs:"11:00-20:00",cls:"월요일",ic:"👁️",vf:false,photos:PH.d},
-  {id:17,n:"길거리 타로",cat:"tarot",rg:"서울",lat:37.555,lng:126.926,addr:"서울 마포구 어울마당로",rt:7.8,rv:891,pr:5000,prl:"5천원",sp:"타로요정",exp:"2년",desc:"가볍게 즐기는 힐링 타로.",tags:["가성비","캐주얼","재미"],ph:"-",hrs:"15:00-22:00",cls:"비올때",ic:"🎪",vf:false,photos:PH.e},
-  {id:18,n:"분당 빛가람",cat:"saju",rg:"경기",lat:37.3827,lng:127.1189,addr:"경기 성남시 분당구",rt:8.9,rv:320,pr:20000,prl:"2만원",sp:"이연리",exp:"5년",desc:"학생·취준생 합리적 사주.",tags:["학생할인","합리적"],ph:"031-9876-5432",hrs:"10:00-20:00",cls:"수요일",ic:"🌳",vf:false,photos:PH.d},
-  {id:19,n:"세종 하늘보살",cat:"sinjeom",rg:"세종",lat:36.601,lng:127.0015,addr:"세종시 조치원읍",rt:8.5,rv:178,pr:55000,prl:"5.5만원",sp:"하늘보살",exp:"22년",desc:"세종 유일의 신점 명소.",tags:["세종유일","정확"],ph:"044-1234-5678",hrs:"09:00-17:00",cls:"일요일",ic:"☁️",vf:true,photos:PH.e},
-  {id:20,n:"인천 차이나 관상",cat:"gwansang",rg:"인천",lat:37.475,lng:126.618,addr:"인천 차이나타운로 45",rt:8.3,rv:234,pr:35000,prl:"3.5만원",sp:"왕선생",exp:"20년",desc:"중국 전통 관상학 정통 풀이.",tags:["중국식","독특"],ph:"032-1234-5678",hrs:"10:00-19:00",cls:"화요일",ic:"🐉",vf:false,photos:PH.d}
+const D=[
+  {id:1,n:"천운당",cat:"saju",rg:"서울",lat:37.5715,lng:126.986,addr:"서울 종로구 인사동길 42",rt:9.2,rv:847,pr:60000,prl:"6만원",sp:"김천운",exp:"32년",desc:"3대째 이어온 전통 사주 명가. 정확한 사주풀이와 따뜻한 상담으로 유명합니다.",tags:["정확함","친절","예약필수"],ph:"02-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🏛️",vf:1,photos:PH.a},
+  {id:2,n:"명리학당",cat:"saju",rg:"서울",lat:37.5013,lng:127.0396,addr:"서울 강남구 테헤란로 156",rt:8.8,rv:623,pr:70000,prl:"7만원",sp:"박명리",exp:"25년",desc:"현대적 감각의 사주 해석. 직장인·사업가 고객 다수.",tags:["사업운","재물운","직장운"],ph:"02-2345-6789",hrs:"11:00-21:00",cls:"월요일",ic:"📖",vf:1,photos:PH.b},
+  {id:3,n:"신령당",cat:"sinjeom",rg:"서울",lat:37.5568,lng:126.9106,addr:"서울 마포구 망원동 72-3",rt:9.5,rv:1203,pr:120000,prl:"12만원",sp:"신령보살",exp:"40년",desc:"전국에서 찾아오는 용한 무당. TV 방송 다수 출연.",tags:["용하다","소름","신기함"],ph:"02-3456-7890",hrs:"09:00-18:00",cls:"수요일",ic:"🔮",vf:1,photos:PH.c},
+  {id:4,n:"달빛타로",cat:"tarot",rg:"서울",lat:37.5563,lng:126.9237,addr:"서울 홍대입구 어울마당로 52",rt:8.5,rv:456,pr:30000,prl:"3만원",sp:"Luna",exp:"8년",desc:"감성적 공간에서 타로 리딩. 연애운·진로 특화.",tags:["감성적","연애운","분위기좋음"],ph:"02-4567-8901",hrs:"13:00-22:00",cls:"화요일",ic:"🌙",vf:0,photos:PH.b},
+  {id:5,n:"해운보살",cat:"sinjeom",rg:"부산",lat:35.1587,lng:129.1601,addr:"부산 해운대구 중동 1543",rt:9.7,rv:2105,pr:80000,prl:"8만원",sp:"해운보살",exp:"45년",desc:"부산 최고의 신점. 45년간 한자리를 지킨 전설.",tags:["전설","정확함","줄서서감"],ph:"051-1234-5678",hrs:"08:00-17:00",cls:"일요일",ic:"🌊",vf:1,photos:PH.a},
+  {id:6,n:"팔공산 도사",cat:"saju",rg:"대구",lat:35.8714,lng:128.6014,addr:"대구 동구 팔공산로 185",rt:8.9,rv:534,pr:50000,prl:"5만원",sp:"팔공도사",exp:"35년",desc:"팔공산 자락에서 수행한 도사님.",tags:["산속","수행자","도사"],ph:"053-1234-5678",hrs:"10:00-16:00",cls:"토,일",ic:"⛰️",vf:1,photos:PH.d},
+  {id:7,n:"빛고을 타로",cat:"tarot",rg:"광주",lat:35.146,lng:126.9186,addr:"광주 동구 충장로 87",rt:8.3,rv:312,pr:25000,prl:"2.5만원",sp:"별이",exp:"6년",desc:"광주 핫플 타로샵. SNS 입소문.",tags:["핫플","SNS유명","가성비"],ph:"062-1234-5678",hrs:"12:00-21:00",cls:"월요일",ic:"✨",vf:0,photos:PH.d},
+  {id:8,n:"은하수 사주",cat:"saju",rg:"대전",lat:36.3504,lng:127.3845,addr:"대전 서구 둔산동 1587",rt:8.6,rv:289,pr:40000,prl:"4만원",sp:"은하선생",exp:"20년",desc:"과학적이고 논리적인 사주 해석.",tags:["논리적","과학적"],ph:"042-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🌌",vf:1,photos:PH.d},
+  {id:9,n:"제주 해신당",cat:"sinjeom",rg:"제주",lat:33.394,lng:126.2396,addr:"제주 한림읍 협재리",rt:9.1,rv:678,pr:70000,prl:"7만원",sp:"해신보살",exp:"30년",desc:"제주 바다의 기운을 받은 강력한 신점.",tags:["제주여행","바다기운"],ph:"064-1234-5678",hrs:"09:00-17:00",cls:"수요일",ic:"🏝️",vf:1,photos:PH.c},
+  {id:10,n:"춘천 달타로",cat:"tarot",rg:"강원",lat:37.8813,lng:127.7298,addr:"춘천시 명동길 24",rt:8.1,rv:198,pr:20000,prl:"2만원",sp:"달빛",exp:"5년",desc:"아늑한 타로카페.",tags:["카페","아늑함","차포함"],ph:"033-1234-5678",hrs:"11:00-20:00",cls:"화요일",ic:"🍵",vf:0,photos:PH.e},
+  {id:11,n:"수원 점술관",cat:"saju",rg:"경기",lat:37.2886,lng:127.0015,addr:"수원 팔달구 화성행궁로 21",rt:8.4,rv:345,pr:45000,prl:"4.5만원",sp:"화성도사",exp:"22년",desc:"수원화성 근처 전통 점술관.",tags:["전통","관광지"],ph:"031-1234-5678",hrs:"10:00-18:00",cls:"월요일",ic:"🏯",vf:1,photos:PH.d},
+  {id:12,n:"한옥 신점",cat:"sinjeom",rg:"전주",lat:35.8151,lng:127.153,addr:"전주 한옥마을길 55",rt:9.0,rv:567,pr:60000,prl:"6만원",sp:"한옥보살",exp:"28년",desc:"한옥마을에서 전통 방식의 신점.",tags:["한옥마을","전통방식"],ph:"063-1234-5678",hrs:"09:00-18:00",cls:"일요일",ic:"🏡",vf:1,photos:PH.b},
+  {id:13,n:"울산 태화",cat:"saju",rg:"울산",lat:35.5537,lng:129.3114,addr:"울산 중구 태화동",rt:8.2,rv:210,pr:40000,prl:"4만원",sp:"태화선생",exp:"18년",desc:"태화강변 사주 상담.",tags:["조용함","강변"],ph:"052-1234-5678",hrs:"10:00-18:00",cls:"토요일",ic:"🌿",vf:0,photos:PH.e},
+  {id:14,n:"강릉 동해 점집",cat:"sinjeom",rg:"강원",lat:37.796,lng:128.896,addr:"강릉시 경포로 398",rt:8.7,rv:401,pr:50000,prl:"5만원",sp:"동해보살",exp:"33년",desc:"동해 기운의 용한 점집.",tags:["동해기운","경포대"],ph:"033-2345-6789",hrs:"08:00-17:00",cls:"일요일",ic:"🌅",vf:1,photos:PH.d},
+  {id:15,n:"종로 백운관상",cat:"gwansang",rg:"서울",lat:37.57,lng:126.983,addr:"서울 종로구 관철동 14-5",rt:9.0,rv:389,pr:50000,prl:"5만원",sp:"백운선생",exp:"28년",desc:"인상학의 대가. TV 방송 다수 출연.",tags:["관상명인","정확함","TV출연"],ph:"02-5678-1234",hrs:"10:00-18:00",cls:"일요일",ic:"🎭",vf:1,photos:PH.c},
+  {id:16,n:"서면 얼굴명가",cat:"gwansang",rg:"부산",lat:35.153,lng:129.0596,addr:"부산 서면로 68",rt:8.7,rv:267,pr:40000,prl:"4만원",sp:"김관상",exp:"15년",desc:"MZ세대 인기 관상 풀이.",tags:["MZ인기","현대적"],ph:"051-5678-1234",hrs:"11:00-20:00",cls:"월요일",ic:"👁️",vf:0,photos:PH.d},
+  {id:17,n:"길거리 타로",cat:"tarot",rg:"서울",lat:37.555,lng:126.926,addr:"서울 마포구 어울마당로",rt:7.8,rv:891,pr:5000,prl:"5천원",sp:"타로요정",exp:"2년",desc:"가볍게 즐기는 힐링 타로.",tags:["가성비","캐주얼","재미"],ph:"-",hrs:"15:00-22:00",cls:"비올때",ic:"🎪",vf:0,photos:PH.e},
+  {id:18,n:"분당 빛가람",cat:"saju",rg:"경기",lat:37.3827,lng:127.1189,addr:"경기 성남시 분당구",rt:8.9,rv:320,pr:20000,prl:"2만원",sp:"이연리",exp:"5년",desc:"학생·취준생 합리적 사주.",tags:["학생할인","합리적"],ph:"031-9876-5432",hrs:"10:00-20:00",cls:"수요일",ic:"🌳",vf:0,photos:PH.d},
+  {id:19,n:"세종 하늘보살",cat:"sinjeom",rg:"대전",lat:36.501,lng:127.002,addr:"세종시 조치원읍",rt:8.5,rv:178,pr:55000,prl:"5.5만원",sp:"하늘보살",exp:"22년",desc:"세종 지역 유일의 신점 명소.",tags:["세종유일","정확"],ph:"044-1234-5678",hrs:"09:00-17:00",cls:"일요일",ic:"☁️",vf:1,photos:PH.e},
+  {id:20,n:"인천 차이나 관상",cat:"gwansang",rg:"인천",lat:37.475,lng:126.618,addr:"인천 차이나타운로 45",rt:8.3,rv:234,pr:35000,prl:"3.5만원",sp:"왕선생",exp:"20년",desc:"중국 전통 관상학 정통 풀이.",tags:["중국식","독특"],ph:"032-1234-5678",hrs:"10:00-19:00",cls:"화요일",ic:"🐉",vf:0,photos:PH.d},
+  // ═══ 추가 20곳 ═══
+  {id:21,n:"이태원 미스틱타로",cat:"tarot",rg:"서울",lat:37.5345,lng:126.994,addr:"서울 용산구 이태원로 180",rt:8.4,rv:534,pr:35000,prl:"3.5만원",sp:"미스틱",exp:"7년",desc:"외국인도 찾는 영어 가능 타로샵. 이태원 감성.",tags:["영어가능","외국인","감성"],ph:"02-7890-1234",hrs:"14:00-23:00",cls:"월요일",ic:"🌟",vf:0,photos:PH.b},
+  {id:22,n:"용산 천기당",cat:"saju",rg:"서울",lat:37.529,lng:126.965,addr:"서울 용산구 한강대로 95",rt:9.1,rv:432,pr:80000,prl:"8만원",sp:"천기도사",exp:"38년",desc:"풍수지리와 사주를 결합한 독보적 상담.",tags:["풍수지리","대기업","VIP"],ph:"02-8901-2345",hrs:"10:00-18:00",cls:"토,일",ic:"🐲",vf:1,photos:PH.a},
+  {id:23,n:"해남 땅끝 신당",cat:"sinjeom",rg:"전남",lat:34.294,lng:126.608,addr:"해남군 송지면 땅끝마을",rt:9.3,rv:445,pr:60000,prl:"6만원",sp:"땅끝보살",exp:"35년",desc:"한반도 최남단에서 강력한 기운의 신점.",tags:["땅끝마을","강력","기운"],ph:"061-1234-5678",hrs:"08:00-16:00",cls:"일요일",ic:"🌅",vf:1,photos:PH.c},
+  {id:24,n:"안동 하회 점술",cat:"saju",rg:"경북",lat:36.566,lng:128.729,addr:"안동시 풍천면 하회리",rt:8.8,rv:312,pr:45000,prl:"4.5만원",sp:"하회선생",exp:"26년",desc:"하회마을의 전통 사주. 유교적 해석.",tags:["전통","하회마을","유교"],ph:"054-1234-5678",hrs:"10:00-17:00",cls:"월요일",ic:"🎎",vf:1,photos:PH.d},
+  {id:25,n:"김해 가야 관상",cat:"gwansang",rg:"경남",lat:35.228,lng:128.889,addr:"김해시 가야의길 102",rt:8.1,rv:189,pr:30000,prl:"3만원",sp:"가야선생",exp:"12년",desc:"가야 문화의 관상 해석.",tags:["가야","역사적","독특"],ph:"055-1234-5678",hrs:"10:00-18:00",cls:"화요일",ic:"👑",vf:0,photos:PH.d},
+  {id:26,n:"속초 설악 보살",cat:"sinjeom",rg:"강원",lat:38.19,lng:128.59,addr:"속초시 설악동 452",rt:9.0,rv:521,pr:65000,prl:"6.5만원",sp:"설악보살",exp:"30년",desc:"설악산의 영기를 받은 강력한 신점.",tags:["설악산","영기","강력"],ph:"033-3456-7890",hrs:"07:00-16:00",cls:"수요일",ic:"🏔️",vf:1,photos:PH.c},
+  {id:27,n:"여수 밤바다 타로",cat:"tarot",rg:"전남",lat:34.76,lng:127.662,addr:"여수시 돌산대교 앞",rt:8.2,rv:287,pr:25000,prl:"2.5만원",sp:"밤바다",exp:"4년",desc:"여수 바다를 보며 타로 리딩.",tags:["야경","바다","로맨틱"],ph:"061-2345-6789",hrs:"16:00-24:00",cls:"화요일",ic:"🌃",vf:0,photos:PH.b},
+  {id:28,n:"청주 무심천 사주",cat:"saju",rg:"충북",lat:36.634,lng:127.489,addr:"청주시 상당구 무심천로",rt:8.5,rv:267,pr:35000,prl:"3.5만원",sp:"무심선생",exp:"15년",desc:"청주 무심천 옆 사주 전문.",tags:["청주","무심천","합리적"],ph:"043-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"💧",vf:1,photos:PH.d},
+  {id:29,n:"포항 호미곶 신점",cat:"sinjeom",rg:"경북",lat:36.077,lng:129.567,addr:"포항시 남구 호미곶면",rt:8.9,rv:356,pr:55000,prl:"5.5만원",sp:"호미보살",exp:"25년",desc:"한반도 최동단 해돋이 기운의 신점.",tags:["해돋이","최동단","기운"],ph:"054-2345-6789",hrs:"05:00-15:00",cls:"수요일",ic:"☀️",vf:1,photos:PH.c},
+  {id:30,n:"일산 라벤더 타로",cat:"tarot",rg:"경기",lat:37.658,lng:126.77,addr:"고양시 일산서구 주엽동",rt:8.0,rv:412,pr:15000,prl:"1.5만원",sp:"라벤더",exp:"3년",desc:"힐링 컨셉의 아로마 타로.",tags:["힐링","아로마","저렴"],ph:"031-4567-8901",hrs:"12:00-21:00",cls:"월요일",ic:"💜",vf:0,photos:PH.d},
+  {id:31,n:"목포 유달산 보살",cat:"sinjeom",rg:"전남",lat:34.786,lng:126.385,addr:"목포시 유달산길 88",rt:9.2,rv:489,pr:70000,prl:"7만원",sp:"유달보살",exp:"32년",desc:"목포 유달산의 영험한 신점.",tags:["유달산","영험","전설"],ph:"061-3456-7890",hrs:"08:00-17:00",cls:"일요일",ic:"⛩️",vf:1,photos:PH.c},
+  {id:32,n:"경주 천년 관상",cat:"gwansang",rg:"경북",lat:35.856,lng:129.224,addr:"경주시 황남동 포석로",rt:8.6,rv:298,pr:45000,prl:"4.5만원",sp:"천년선생",exp:"22년",desc:"신라 천년의 관상학.",tags:["경주","신라","역사"],ph:"054-3456-7890",hrs:"10:00-18:00",cls:"화요일",ic:"🏺",vf:1,photos:PH.d},
+  {id:33,n:"원주 치악산 도사",cat:"saju",rg:"강원",lat:37.35,lng:127.95,addr:"원주시 행구동 치악산로",rt:8.7,rv:234,pr:50000,prl:"5만원",sp:"치악도사",exp:"28년",desc:"치악산에서 수행한 도사의 사주.",tags:["치악산","수행","산속"],ph:"033-4567-8901",hrs:"09:00-16:00",cls:"토,일",ic:"🌲",vf:1,photos:PH.d},
+  {id:34,n:"부천 판타지 타로",cat:"tarot",rg:"경기",lat:37.504,lng:126.766,addr:"부천시 원미구 상동",rt:7.9,rv:567,pr:10000,prl:"1만원",sp:"판타지",exp:"3년",desc:"만화의 도시 부천의 유니크한 타로.",tags:["유니크","만화컨셉","저렴"],ph:"032-4567-8901",hrs:"13:00-22:00",cls:"수요일",ic:"🦄",vf:0,photos:PH.e},
+  {id:35,n:"창원 마산 신당",cat:"sinjeom",rg:"경남",lat:35.182,lng:128.572,addr:"창원시 마산합포구 해안대로",rt:8.8,rv:378,pr:60000,prl:"6만원",sp:"마산보살",exp:"27년",desc:"마산항의 바다 기운을 품은 신당.",tags:["마산항","바다기운","정확"],ph:"055-2345-6789",hrs:"08:00-17:00",cls:"일요일",ic:"⚓",vf:1,photos:PH.c},
+  {id:36,n:"양평 힐링 사주",cat:"saju",rg:"경기",lat:37.491,lng:127.488,addr:"양평군 양평읍 시장길",rt:8.3,rv:156,pr:30000,prl:"3만원",sp:"양평선생",exp:"10년",desc:"자연 속 힐링 사주 상담.",tags:["힐링","자연","여행"],ph:"031-5678-9012",hrs:"10:00-18:00",cls:"월요일",ic:"🌾",vf:0,photos:PH.d},
+  {id:37,n:"천안 아산 관상",cat:"gwansang",rg:"충남",lat:36.815,lng:127.114,addr:"천안시 동남구 신부동",rt:8.4,rv:212,pr:35000,prl:"3.5만원",sp:"온양선생",exp:"16년",desc:"온양온천 근처 관상 전문.",tags:["온양온천","관상","친절"],ph:"041-1234-5678",hrs:"10:00-19:00",cls:"화요일",ic:"♨️",vf:0,photos:PH.d},
+  {id:38,n:"광명동굴 타로",cat:"tarot",rg:"경기",lat:37.418,lng:126.866,addr:"광명시 가학동 광명동굴",rt:8.1,rv:345,pr:20000,prl:"2만원",sp:"동굴요정",exp:"4년",desc:"동굴 속 신비로운 타로 체험.",tags:["동굴","신비","체험"],ph:"02-6789-0123",hrs:"11:00-20:00",cls:"월요일",ic:"🕯️",vf:0,photos:PH.b},
+  {id:39,n:"순천 정원 보살",cat:"sinjeom",rg:"전남",lat:34.95,lng:127.487,addr:"순천시 국가정원길",rt:8.9,rv:334,pr:55000,prl:"5.5만원",sp:"정원보살",exp:"24년",desc:"순천만 정원 옆 자연 속 신점.",tags:["순천만","정원","자연"],ph:"061-4567-8901",hrs:"09:00-17:00",cls:"수요일",ic:"🌸",vf:1,photos:PH.c},
+  {id:40,n:"파주 DMZ 영술",cat:"sinjeom",rg:"경기",lat:37.895,lng:126.78,addr:"파주시 문산읍 임진각로",rt:8.6,rv:267,pr:65000,prl:"6.5만원",sp:"임진보살",exp:"20년",desc:"분단의 기운이 서린 곳의 강력한 영술.",tags:["DMZ","강력","분단기운"],ph:"031-6789-0123",hrs:"08:00-16:00",cls:"일요일",ic:"🕊️",vf:1,photos:PH.d},
 ];
 
-const RV=[
-  {pid:1,au:"민지",dt:"2025.12.15",sc:10,tx:"소름끼칠 정도로 정확했어요. 이직 시기도 딱 맞춰주셨습니다.",hl:234,vf:true},
-  {pid:1,au:"현우",dt:"2025.11.28",sc:9,tx:"사주풀이가 매우 논리적이고 구체적입니다.",hl:156,vf:true},
-  {pid:3,au:"지은",dt:"2025.12.20",sc:10,tx:"이름도 안 말했는데 가족 상황을 다 맞추셨어요.",hl:567,vf:true},
-  {pid:3,au:"태민",dt:"2025.12.01",sc:10,tx:"반신반의하고 갔다가 인생관이 바뀌었습니다.",hl:312,vf:false},
-  {pid:5,au:"서연",dt:"2025.12.18",sc:10,tx:"부산 여행 중 들렀는데 인생 점집입니다.",hl:445,vf:true},
-  {pid:5,au:"도현",dt:"2025.12.05",sc:10,tx:"새벽 5시에 줄 섰는데 그만한 가치가 있었어요.",hl:389,vf:true},
-  {pid:9,au:"지수",dt:"2025.12.16",sc:9,tx:"제주 여행보다 이게 더 기억에 남아요.",hl:201,vf:true},
-  {pid:12,au:"시우",dt:"2025.12.11",sc:9,tx:"한옥마을 분위기와 어울려서 특별했어요.",hl:178,vf:false},
-  {pid:15,au:"예진",dt:"2025.12.22",sc:10,tx:"관상으로 성격을 다 맞추셔서 놀랐어요.",hl:290,vf:true},
-  {pid:17,au:"하은",dt:"2025.12.25",sc:8,tx:"5천원에 이 정도면 가성비 미쳤어요!",hl:445,vf:true}
+const RV_DB=[
+  {pid:1,au:"민지",dt:"2025.12.15",sc:10,tx:"소름끼칠 정도로 정확했어요. 이직 시기도 딱 맞춰주셨습니다.",hl:234,vf:1},
+  {pid:1,au:"현우",dt:"2025.11.28",sc:9,tx:"사주풀이가 매우 논리적이고 구체적입니다.",hl:156,vf:1},
+  {pid:3,au:"지은",dt:"2025.12.20",sc:10,tx:"이름도 안 말했는데 가족 상황을 다 맞추셨어요.",hl:567,vf:1},
+  {pid:3,au:"태민",dt:"2025.12.01",sc:10,tx:"반신반의하고 갔다가 인생관이 바뀌었습니다.",hl:312,vf:0},
+  {pid:5,au:"서연",dt:"2025.12.18",sc:10,tx:"부산 여행 중 들렀는데 인생 점집입니다.",hl:445,vf:1},
+  {pid:5,au:"도현",dt:"2025.12.05",sc:10,tx:"새벽 5시에 줄 섰는데 그만한 가치가 있었어요.",hl:389,vf:1},
+  {pid:9,au:"지수",dt:"2025.12.16",sc:9,tx:"제주 여행보다 이게 더 기억에 남아요.",hl:201,vf:1},
+  {pid:12,au:"시우",dt:"2025.12.11",sc:9,tx:"한옥마을 분위기와 어울려서 특별했어요.",hl:178,vf:0},
+  {pid:15,au:"예진",dt:"2025.12.22",sc:10,tx:"관상으로 성격을 다 맞추셔서 놀랐어요.",hl:290,vf:1},
+  {pid:17,au:"하은",dt:"2025.12.25",sc:8,tx:"5천원에 이 정도면 가성비 미쳤어요!",hl:445,vf:1},
+  {pid:22,au:"성진",dt:"2026.01.10",sc:9,tx:"풍수지리까지 봐주시니 사주의 깊이가 다릅니다.",hl:123,vf:1},
+  {pid:26,au:"다희",dt:"2026.01.05",sc:10,tx:"설악산 영기가 진짜인 것 같아요. 신비로웠습니다.",hl:278,vf:1},
+  {pid:31,au:"재혁",dt:"2026.01.15",sc:10,tx:"유달산 보살님 정말 용하세요. 감사합니다.",hl:312,vf:1},
+  {pid:35,au:"수빈",dt:"2026.01.20",sc:9,tx:"마산 바다 기운이 느껴지는 특별한 경험이었어요.",hl:187,vf:1},
 ];
 
-// ═══════════════════════════════════
-//  STATE
-// ═══════════════════════════════════
-let cc='all',cr='전국',cp=0,cv='map',dk=false;
+// ═══════ STATE ═══════
+let cc='all',cr='전국',cpi=0,cv='map',dk=false;
 let li=false,lu='';
 let fav=[1,5,3];
 let res=[{id:"R1001",pid:1,n:"천운당",dt:"2026-02-15",tm:"14:00",pr:"6만원",st:"completed"}];
 let pay=[{id:"P1001",n:"천운당",dt:"2026-02-10",pr:"6만원",mt:"간편결제"}];
+let myRv=[{pid:1,sc:9,tx:"정말 좋았어요. 다음에 또 갈게요.",dt:"2026-02-16"}]; // user's own reviews
 let sh=["천운당","관상","부산 신점"];
-let cp2=null,mm='detail',cvm=new Date(),csel=null,btm=null;
+let cp2=null,mm='detail',cvm=new Date(),csel=null,btm=null,rvScore=0;
 
-// ═══════════════════════════════════
-//  MAP
-// ═══════════════════════════════════
+// ═══════ MAP ═══════
 const map=L.map('map',{zoomControl:false,attributionControl:false}).setView([36.0,127.5],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 L.control.zoom({position:'topright'}).addTo(map);
 const ml=L.layerGroup().addTo(map);
+window.addEventListener('load',()=>map.invalidateSize());
+setTimeout(()=>map.invalidateSize(),100);setTimeout(()=>map.invalidateSize(),500);setTimeout(()=>map.invalidateSize(),1500);
 
-// Force invalidate on load
-window.addEventListener('load',()=>{map.invalidateSize();});
-setTimeout(()=>map.invalidateSize(),100);
-setTimeout(()=>map.invalidateSize(),500);
-setTimeout(()=>map.invalidateSize(),1500);
-
-// ═══════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════
+// ═══════ HELPERS ═══════
 const $=id=>document.getElementById(id);
 const isDk=()=>$('app').dataset.theme==='dark';
 const cbg=c=>isDk()?CT[c].db:CT[c].bg;
-const st=(s,z=11)=>[1,2,3,4,5].map(i=>`<span class="${i<=Math.round(s/2)?'st':'sto'}" style="font-size:${z}px">★</span>`).join('');
+const st=(s,z=12)=>[1,2,3,4,5].map(i=>`<span class="${i<=Math.round(s/2)?'st':'sto'}" style="font-size:${z}px">★</span>`).join('');
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800);}
-function gf(q){const pf=PR[cp];return P.filter(p=>{if(cc!=='all'&&p.cat!==cc)return!1;if(cr!=='전국'&&p.rg!==cr)return!1;if(p.pr<pf.a||p.pr>pf.b)return!1;if(q&&!p.n.includes(q)&&!p.addr.includes(q)&&!p.sp.includes(q)&&!CT[p.cat].l.includes(q))return!1;return!0;}).sort((a,b)=>b.rt-a.rt);}
+// 가격 필터: 이상(>=) ~ 미만(<) 방식으로 겹침 없음
+function gf(q){const pf=PR[cpi];return D.filter(p=>{if(cc!=='all'&&p.cat!==cc)return!1;if(cr!=='전국'&&p.rg!==cr)return!1;if(p.pr<pf.a||p.pr>=pf.b)return!1;if(q&&!p.n.includes(q)&&!p.addr.includes(q)&&!p.sp.includes(q)&&!CT[p.cat].l.includes(q))return!1;return!0;}).sort((a,b)=>b.rt-a.rt);}
 
-// ═══════════════════════════════════
-//  DARK MODE
-// ═══════════════════════════════════
+// ═══════ DARK MODE ═══════
 $('thm').onclick=()=>{dk=!dk;$('app').dataset.theme=dk?'dark':'light';$('thm').textContent=dk?'☀️':'🌙';rmap();};
 
-// ═══════════════════════════════════
-//  FILTERS
-// ═══════════════════════════════════
+// ═══════ FILTERS ═══════
 function rfilt(){
   $('fc').innerHTML=CL.map(c=>`<button class="fb${cc===c.id?' on':''}" data-c="${c.id}" style="${cc===c.id?'background:'+c.c:''}">${c.ic} ${c.l}</button>`).join('');
+  // 2줄 그리드 지역
   $('fr').innerHTML=RG.map(r=>`<button class="rb${cr===r?' on':''}" data-r="${r}">${r}</button>`).join('');
-  $('fp').innerHTML=PR.map((p,i)=>`<button class="pb${cp===i?' on':''}" data-i="${i}">${p.l}</button>`).join('');
-  $('fc').onclick=e=>{const b=e.target.closest('.fb');if(!b)return;cc=b.dataset.c;cr='전국';cp=0;rfilt();rmap();};
+  $('fp').innerHTML=PR.map((p,i)=>`<button class="pb${cpi===i?' on':''}" data-i="${i}">${p.l}</button>`).join('');
+  $('fc').onclick=e=>{const b=e.target.closest('.fb');if(!b)return;cc=b.dataset.c;cr='전국';cpi=0;rfilt();rmap();};
   $('fr').onclick=e=>{const b=e.target.closest('.rb');if(!b)return;cr=b.dataset.r;rfilt();rmap();};
-  $('fp').onclick=e=>{const b=e.target.closest('.pb');if(!b)return;cp=+b.dataset.i;rfilt();rmap();};
+  $('fp').onclick=e=>{const b=e.target.closest('.pb');if(!b)return;cpi=+b.dataset.i;rfilt();rmap();};
 }
 
-// ═══════════════════════════════════
-//  MAP RENDER
-// ═══════════════════════════════════
+// ═══════ MAP ═══════
 function rmap(){
-  ml.clearLayers();
-  const ls=gf();
+  ml.clearLayers();const ls=gf();
   ls.forEach(p=>{
-    const c=CT[p.cat];
-    const ic=L.divIcon({className:'',html:`<div class="custom-marker" style="background:${c.c};width:36px;height:36px;font-size:16px;color:#fff">${p.ic}</div>`,iconSize:[36,36],iconAnchor:[18,36],popupAnchor:[0,-30]});
+    const c=CT[p.cat];const ic=L.divIcon({className:'',html:`<div class="cm" style="background:${c.c};width:38px;height:38px;font-size:17px;color:#fff">${p.ic}</div>`,iconSize:[38,38],iconAnchor:[19,38],popupAnchor:[0,-32]});
     const m=L.marker([p.lat,p.lng],{icon:ic}).addTo(ml);
-    const vb=p.vf?'<span class="v-badge">✓ 인증</span>':'';
-    m.bindPopup(`<div style="padding:12px 14px;color:var(--tx)"><div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><span style="font-size:24px">${p.ic}</span><div><div style="font-size:14px;font-weight:800">${p.n} ${vb}</div><span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:8px;background:${c.bg};color:${c.c}">${c.l}</span></div></div><div style="font-size:10px;color:var(--sub);margin-bottom:5px">📍 ${p.addr}</div><div style="display:flex;align-items:center;gap:5px"><span style="font-size:18px;font-weight:800;color:var(--pri)">${p.rt}</span>${st(p.rt,12)}<span style="font-size:10px;color:var(--mu)">(${p.rv.toLocaleString()})</span></div><div style="font-size:11px;font-weight:700;color:${c.c};margin-top:3px">💰 ${p.prl} · ${p.sp}</div><button onclick="openD(${p.id})" style="display:block;width:100%;padding:9px;margin-top:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;background:${c.c}">상세 정보 보기</button></div>`,{maxWidth:270,closeButton:true});
+    const vb=p.vf?'<span class="vb">✓ 인증</span>':'';
+    m.bindPopup(`<div style="padding:14px;color:var(--tx)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:26px">${p.ic}</span><div><div style="font-size:15px;font-weight:800">${p.n} ${vb}</div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;background:${c.bg};color:${c.c}">${c.l}</span></div></div><div style="font-size:12px;color:var(--sub);margin-bottom:5px">📍 ${p.addr}</div><div style="display:flex;align-items:center;gap:5px"><span style="font-size:20px;font-weight:800;color:var(--pri)">${p.rt}</span>${st(p.rt,13)}<span style="font-size:11px;color:var(--mu)">(${p.rv.toLocaleString()})</span></div><div style="font-size:13px;font-weight:700;color:${c.c};margin-top:4px">💰 ${p.prl} · ${p.sp}</div><button onclick="openD(${p.id})" style="display:block;width:100%;padding:10px;margin-top:8px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;background:${c.c}">상세 정보 보기</button></div>`,{maxWidth:280,closeButton:true});
   });
-  if(ls.length>0&&ls.length<P.length){map.fitBounds(L.latLngBounds(ls.map(p=>[p.lat,p.lng])).pad(0.3),{animate:true});}
-  else{map.setView([36.0,127.5],7,{animate:true});}
-  $('mbadge').innerHTML=`📍 <b>${ls.length}</b>곳 <span style="font-size:9px;color:var(--mu);margin-left:2px">${cr} · ${PR[cp].l}</span>`;
+  if(ls.length>0&&ls.length<D.length)map.fitBounds(L.latLngBounds(ls.map(p=>[p.lat,p.lng])).pad(0.3),{animate:true});
+  else map.setView([36.0,127.5],7,{animate:true});
+  $('mbg').innerHTML=`📍 <b>${ls.length}</b>곳 <span style="font-size:11px;color:var(--mu);margin-left:3px">${cr} · ${PR[cpi].l}</span>`;
 }
 
-// ═══════════════════════════════════
-//  NAV
-// ═══════════════════════════════════
-function sw(v){
-  cv=v;document.querySelectorAll('.vw').forEach(el=>el.classList.remove('on'));
-  const el=$('v-'+v);if(el)el.classList.add('on');
-  rnav();
-  if(v==='map'){setTimeout(()=>map.invalidateSize(),50);setTimeout(()=>map.invalidateSize(),200);}
-  if(v==='search'){rsearch();$('sinp').value='';setTimeout(()=>$('sinp').focus(),100);}
-  if(v==='wish')rwish();
-  if(v==='my')rmy();
-}
-function rnav(){
-  const its=[["map","🗺️","지도"],["search","🔍","검색"],["wish","❤️","찜"],["my","👤","마이"]];
-  $('bnav').innerHTML=its.map(([v,ic,lb])=>`<button class="nv${cv===v?' on':''}" data-v="${v}"><span class="nv-ic">${ic}</span>${lb}${v==='wish'&&fav.length?`<span class="nv-badge">${fav.length}</span>`:''}</button>`).join('');
-  $('bnav').onclick=e=>{const b=e.target.closest('.nv');if(b)sw(b.dataset.v);};
-}
+// ═══════ NAV ═══════
+function sw(v){cv=v;document.querySelectorAll('.vw').forEach(el=>el.classList.remove('on'));$('v-'+v).classList.add('on');rnav();if(v==='map'){setTimeout(()=>map.invalidateSize(),50);setTimeout(()=>map.invalidateSize(),200);}if(v==='search'){rse();$('sinp').value='';setTimeout(()=>$('sinp').focus(),100);}if(v==='wish')rwi();if(v==='my')rmy();}
+function rnav(){const its=[["map","🗺️","지도"],["search","🔍","검색"],["wish","❤️","찜"],["my","👤","마이"]];$('bnav').innerHTML=its.map(([v,ic,lb])=>`<button class="nv${cv===v?' on':''}" data-v="${v}"><span class="nv-ic">${ic}</span>${lb}${v==='wish'&&fav.length?`<span class="nv-bg">${fav.length}</span>`:''}</button>`).join('');$('bnav').onclick=e=>{const b=e.target.closest('.nv');if(b)sw(b.dataset.v);};}
 
-// ═══════════════════════════════════
-//  SEARCH
-// ═══════════════════════════════════
-function rsearch(){
-  $('shist').style.display='block';$('sres').style.display='none';
-  $('shist').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;font-weight:700;color:var(--tx)">최근 검색어</span><button onclick="sh=[];rsearch()" style="background:none;border:none;font-size:10px;color:var(--mu);cursor:pointer">전체 삭제</button></div><div>${sh.length?sh.map(h=>`<span class="s-tag" onclick="doS('${h}')">${h}</span>`).join(''):'<span style="font-size:11px;color:var(--mu)">검색 내역 없음</span>'}</div><div style="margin-top:20px"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--tx)">🔥 인기 검색어</div>${["해운보살","천운당","관상","홍대 타로","제주 신점"].map((t,i)=>`<div onclick="doS('${t}')" style="padding:9px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;cursor:pointer"><span style="width:20px;text-align:center;font-size:12px;font-weight:800;color:${i<3?'var(--pri)':'var(--mu)'}">${i+1}</span><span style="font-size:12px;color:var(--tx)">${t}</span></div>`).join('')}</div>`;
-}
+// ═══════ SEARCH ═══════
+function rse(){$('shist').style.display='block';$('sres').style.display='none';$('shist').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:14px;font-weight:700;color:var(--tx)">최근 검색어</span><button onclick="sh=[];rse()" style="background:none;border:none;font-size:12px;color:var(--mu);cursor:pointer">전체 삭제</button></div><div>${sh.length?sh.map(h=>`<span class="stag" onclick="doS('${h}')">${h}</span>`).join(''):'<span style="font-size:13px;color:var(--mu)">검색 내역 없음</span>'}</div><div style="margin-top:22px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--tx)">🔥 인기 검색어</div>${["해운보살","천운당","관상","홍대 타로","제주 신점","설악 보살","파주 DMZ"].map((t,i)=>`<div onclick="doS('${t}')" style="padding:11px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;cursor:pointer"><span style="width:22px;text-align:center;font-size:14px;font-weight:800;color:${i<3?'var(--pri)':'var(--mu)'}">${i+1}</span><span style="font-size:14px;color:var(--tx)">${t}</span></div>`).join('')}</div>`;}
 window.doS=q=>{$('sinp').value=q;$('sinp').dispatchEvent(new Event('input'));};
-$('sinp').oninput=function(){
-  const q=this.value.trim();if(!q){rsearch();return;}
-  $('shist').style.display='none';const r=$('sres');r.style.display='block';
-  const ls=gf(q);
-  r.innerHTML=`<div style="padding:8px 14px;font-size:11px;color:var(--sub);border-bottom:1px solid var(--bd)">결과 <span style="color:var(--pri);font-weight:700">${ls.length}</span>건</div>${ls.length===0?'<div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">검색 결과 없음</div>':ls.map(p=>{const c=CT[p.cat];return`<div class="si" onclick="addSH('${q}');openD(${p.id})"><div class="si-ic" style="background:${cbg(p.cat)}">${p.ic}</div><div style="flex:1"><div style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;color:var(--tx)">${p.n}${p.vf?'<span class="v-badge">✓ 인증</span>':''}<span style="font-size:8px;color:${c.c};background:${cbg(p.cat)};padding:1px 5px;border-radius:6px">${c.l}</span></div><div style="font-size:10px;color:var(--sub)">📍 ${p.addr}</div><div style="font-size:10px;font-weight:700;color:var(--pri);margin-top:1px">⭐ ${p.rt} · ${p.prl}</div></div></div>`;}).join('')}`;
-};
+$('sinp').oninput=function(){const q=this.value.trim();if(!q){rse();return;}$('shist').style.display='none';const r=$('sres');r.style.display='block';const ls=gf(q);r.innerHTML=`<div style="padding:10px 14px;font-size:13px;color:var(--sub);border-bottom:1px solid var(--bd)">결과 <span style="color:var(--pri);font-weight:700">${ls.length}</span>건</div>${ls.length===0?'<div style="text-align:center;padding:40px;color:var(--mu);font-size:14px">검색 결과 없음</div>':ls.map(p=>{const c=CT[p.cat];return`<div class="si" onclick="addSH('${q}');openD(${p.id})"><div class="si-ic" style="background:${cbg(p.cat)}">${p.ic}</div><div style="flex:1"><div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;color:var(--tx)">${p.n}${p.vf?'<span class="vb">✓ 인증</span>':''}<span style="font-size:10px;color:${c.c};background:${cbg(p.cat)};padding:1px 6px;border-radius:7px">${c.l}</span></div><div style="font-size:12px;color:var(--sub)">📍 ${p.addr}</div><div style="font-size:12px;font-weight:700;color:var(--pri);margin-top:2px">⭐ ${p.rt} · ${p.prl}</div></div></div>`;}).join('')}`;};
 window.addSH=q=>{sh=[q,...sh.filter(h=>h!==q)].slice(0,10);};
 
-// ═══════════════════════════════════
-//  WISHLIST
-// ═══════════════════════════════════
-function rwish(){
-  const el=$('v-wish');
-  if(!fav.length){el.innerHTML=`<div style="padding:16px"><h2 style="font-size:16px;font-weight:800;color:var(--tx)">❤️ 찜한 곳</h2></div><div style="text-align:center;padding:40px;color:var(--mu);font-size:12px">찜한 점술가가 없습니다.</div>`;return;}
-  el.innerHTML=`<div style="padding:14px 16px"><h2 style="font-size:16px;font-weight:800;color:var(--tx)">❤️ 찜한 곳 <span style="color:var(--pri)">${fav.length}</span></h2></div>`+fav.map(fid=>{const p=P.find(x=>x.id===fid);if(!p)return'';const c=CT[p.cat];return`<div class="wcard" onclick="openD(${p.id})"><div style="width:44px;height:44px;border-radius:10px;background:${cbg(p.cat)};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${p.ic}</div><div style="flex:1"><div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px;color:var(--tx)">${p.n}${p.vf?'<span class="v-badge">✓</span>':''}</div><div style="font-size:10px;color:var(--sub)">📍 ${p.addr}</div><div style="font-size:11px;font-weight:700;color:var(--pri);margin-top:1px">⭐ ${p.rt} · ${p.prl}</div></div><button onclick="event.stopPropagation();fav=fav.filter(f=>f!==${p.id});rwish();rnav();toast('삭제됨')" style="background:none;border:none;font-size:18px;cursor:pointer">❤️</button></div>`;}).join('');
-}
+// ═══════ WISHLIST ═══════
+function rwi(){const el=$('v-wish');if(!fav.length){el.innerHTML=`<div style="padding:18px"><h2 style="font-size:18px;font-weight:800;color:var(--tx)">❤️ 찜한 곳</h2></div><div style="text-align:center;padding:40px;color:var(--mu);font-size:14px">찜한 점술가가 없습니다.</div>`;return;}el.innerHTML=`<div style="padding:16px 18px"><h2 style="font-size:18px;font-weight:800;color:var(--tx)">❤️ 찜한 곳 <span style="color:var(--pri)">${fav.length}</span></h2></div>`+fav.map(fid=>{const p=D.find(x=>x.id===fid);if(!p)return'';const c=CT[p.cat];return`<div class="wc" onclick="openD(${p.id})"><div style="width:48px;height:48px;border-radius:12px;background:${cbg(p.cat)};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${p.ic}</div><div style="flex:1"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:5px;color:var(--tx)">${p.n}${p.vf?'<span class="vb">✓</span>':''}</div><div style="font-size:12px;color:var(--sub)">📍 ${p.addr}</div><div style="font-size:13px;font-weight:700;color:var(--pri);margin-top:2px">⭐ ${p.rt} · ${p.prl}</div></div><button onclick="event.stopPropagation();fav=fav.filter(f=>f!==${p.id});rwi();rnav();toast('삭제됨')" style="background:none;border:none;font-size:20px;cursor:pointer">❤️</button></div>`;}).join('');}
 
-// ═══════════════════════════════════
-//  MY PAGE
-// ═══════════════════════════════════
-function rmy(){
-  $('hd-user').textContent=li?lu:'';
-  const el=$('v-my');
-  if(!li){el.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:30px;background:var(--surf);transition:all .35s"><div style="font-size:44px;margin-bottom:6px">🔮</div><div style="font-size:18px;font-weight:800;margin-bottom:3px;color:var(--tx)">운명지도 시작하기</div><div style="font-size:11px;color:var(--mu);margin-bottom:24px">로그인하고 예약·찜 기능을 이용하세요</div><button class="sbtn sn" onclick="doLI('네이버')"><b>N</b> 네이버로 로그인</button><button class="sbtn sk" onclick="doLI('카카오')"><b style='font-weight:900'>K</b> 카카오로 로그인</button><button class="sbtn sg" onclick="doLI('구글')"><b style='color:#EA4335'>G</b> 구글로 로그인</button><button class="sbtn sa" onclick="doLI('Apple')"> Apple로 로그인</button><div style="font-size:9px;color:var(--mu);margin-top:12px;text-align:center;line-height:1.4">로그인 시 이용약관 및 개인정보 처리방침에 동의</div></div>`;return;}
-  el.innerHTML=`<div style="padding:16px;background:var(--surf);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;transition:all .35s"><div><div style="font-size:15px;font-weight:800;color:var(--tx)">${lu}님, 환영합니다!</div><div style="font-size:10px;color:var(--mu);margin-top:2px">오늘도 좋은 운이 가득하길 🍀</div></div><button onclick="doLO()" style="padding:5px 10px;border-radius:6px;font-size:10px;font-weight:600;color:var(--sub);background:var(--bg3);border:none;cursor:pointer">로그아웃</button></div><h3 style="font-size:14px;font-weight:800;padding:0 16px;margin-bottom:8px;color:var(--tx)">📅 나의 예약</h3>${res.length?[...res].reverse().map(r=>`<div class="rcard"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="rstatus ${r.st}">${r.st==='active'?'예약 확정':r.st==='completed'?'방문 완료':'예약취소'}</span><span style="font-size:9px;color:var(--mu)">#${r.id}</span></div><div style="font-size:14px;font-weight:800;margin-bottom:4px;color:var(--tx)">${r.n}</div><div style="font-size:11px;color:var(--sub)">📅 ${r.dt} ${r.tm} &nbsp; 💰 ${r.pr}</div>${r.st==='active'?`<button onclick="cRes('${r.id}')" style="width:100%;margin-top:8px;padding:8px;border-radius:6px;border:1px solid var(--bd2);background:var(--surf);font-size:11px;font-weight:600;cursor:pointer;color:var(--red)">예약 취소</button>`:''}</div>`).join(''):'<div style="text-align:center;padding:20px;color:var(--mu);font-size:11px">예약 내역 없음</div>'}<h3 style="font-size:14px;font-weight:800;padding:10px 16px 8px;color:var(--tx)">💳 결제 내역</h3>${pay.length?[...pay].reverse().map(p=>`<div class="pcard"><div><div style="font-size:12px;font-weight:700;color:var(--tx)">${p.n}</div><div style="font-size:10px;color:var(--mu);margin-top:1px">${p.dt} · ${p.mt}</div></div><div style="font-size:13px;font-weight:800;color:var(--tx)">${p.pr}</div></div>`).join(''):'<div style="text-align:center;padding:20px;color:var(--mu);font-size:11px">결제 내역 없음</div>'}<div style="height:20px"></div>`;
+// ═══════ MY PAGE ═══════
+function rmy(){$('hu').textContent=li?lu:'';const el=$('v-my');
+  if(!li){el.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:30px;background:var(--sf)"><div style="font-size:48px;margin-bottom:8px">🔮</div><div style="font-size:20px;font-weight:800;margin-bottom:4px;color:var(--tx)">운명지도 시작하기</div><div style="font-size:13px;color:var(--mu);margin-bottom:26px">로그인하고 예약·찜 기능을 이용하세요</div><button class="sb sn" onclick="doLI('네이버')"><b>N</b> 네이버로 로그인</button><button class="sb sk" onclick="doLI('카카오')"><b style='font-weight:900'>K</b> 카카오로 로그인</button><button class="sb sg" onclick="doLI('구글')"><b style='color:#EA4335'>G</b> 구글로 로그인</button><button class="sb sa" onclick="doLI('Apple')"> Apple로 로그인</button><div style="font-size:11px;color:var(--mu);margin-top:14px;text-align:center;line-height:1.4">로그인 시 이용약관 및 개인정보 처리방침에 동의</div></div>`;return;}
+  // 내 리뷰 섹션 포함
+  const myRvHtml=myRv.length?myRv.map(r=>{const p=D.find(x=>x.id===r.pid);return`<div class="rc" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:15px;font-weight:700;color:var(--tx)">${p?p.n:'알 수 없음'} <span style="font-size:12px;color:var(--mu)">${p?p.ic:''}</span></div><span style="font-size:11px;color:var(--mu)">${r.dt}</span></div><div style="margin-bottom:4px">${st(r.sc,14)}</div><div style="font-size:13px;color:var(--tx2);line-height:1.5">${r.tx}</div></div>`;}).join(''):'<div style="text-align:center;padding:20px;color:var(--mu);font-size:13px">작성한 리뷰 없음</div>';
+
+  el.innerHTML=`<div style="padding:18px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:17px;font-weight:800;color:var(--tx)">${lu}님, 환영합니다!</div><div style="font-size:12px;color:var(--mu);margin-top:3px">오늘도 좋은 운이 가득하길 🍀</div></div><button onclick="doLO()" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;color:var(--sub);background:var(--bg3);border:none;cursor:pointer">로그아웃</button></div>
+  <h3 style="font-size:16px;font-weight:800;padding:0 18px;margin-bottom:10px;color:var(--tx)">📅 나의 예약</h3>${res.length?[...res].reverse().map(r=>`<div class="rc"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="rs ${r.st}">${r.st==='active'?'예약 확정':r.st==='completed'?'방문 완료':'예약취소'}</span><span style="font-size:11px;color:var(--mu)">#${r.id}</span></div><div style="font-size:16px;font-weight:800;margin-bottom:5px;color:var(--tx)">${r.n}</div><div style="font-size:13px;color:var(--sub)">📅 ${r.dt} ${r.tm} &nbsp; 💰 ${r.pr}</div>${r.st==='active'?`<button onclick="cRes('${r.id}')" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf);font-size:13px;font-weight:600;cursor:pointer;color:var(--red)">예약 취소</button>`:''}</div>`).join(''):'<div style="text-align:center;padding:22px;color:var(--mu);font-size:13px">예약 내역 없음</div>'}
+  <h3 style="font-size:16px;font-weight:800;padding:12px 18px 10px;color:var(--tx)">💳 결제 내역</h3>${pay.length?[...pay].reverse().map(p=>`<div class="pc"><div><div style="font-size:14px;font-weight:700;color:var(--tx)">${p.n}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">${p.dt} · ${p.mt}</div></div><div style="font-size:15px;font-weight:800;color:var(--tx)">${p.pr}</div></div>`).join(''):'<div style="text-align:center;padding:22px;color:var(--mu);font-size:13px">결제 내역 없음</div>'}
+  <h3 style="font-size:16px;font-weight:800;padding:12px 18px 10px;color:var(--tx)">✏️ 내 리뷰</h3>${myRvHtml}<div style="height:24px"></div>`;
 }
 window.doLI=p=>{li=true;lu=p+' 유저';rmy();toast(p+' 로그인 완료!');};
 window.doLO=()=>{li=false;lu='';rmy();toast('로그아웃');};
 window.cRes=id=>{if(!confirm('예약을 취소하시겠습니까?'))return;res=res.map(r=>r.id===id?{...r,st:'cancelled'}:r);rmy();toast('취소됨');};
 
-// ═══════════════════════════════════
-//  MODAL
-// ═══════════════════════════════════
-window.openD=function(id){const p=P.find(x=>x.id===id);if(!p)return;cp2=p;mm='detail';map.closePopup();rmod();$('mo').classList.add('on');};
+// ═══════ MODAL ═══════
+window.openD=function(id){const p=D.find(x=>x.id===id);if(!p)return;cp2=p;mm='detail';rvScore=0;map.closePopup();rmod();$('mo').classList.add('on');};
 function closeM(){$('mo').classList.remove('on');cp2=null;}
-$('mclose').onclick=closeM;
+$('mcl').onclick=closeM;
 $('mfav').onclick=()=>{if(!cp2)return;const id=cp2.id;if(fav.includes(id)){fav=fav.filter(f=>f!==id);toast('삭제됨');}else{fav.push(id);toast('추가됨 ❤️');}$('mfav').textContent=fav.includes(id)?'❤️':'🤍';rnav();};
 $('mback').onclick=()=>{mm='detail';rmod();};
 
 function rmod(){
   if(!cp2)return;const p=cp2,c=CT[p.cat];
-  $('mfav').textContent=fav.includes(p.id)?'❤️':'🤍';
-  $('mfav').style.display=mm==='detail'?'block':'none';
-  $('mback').style.display=mm==='booking'?'flex':'none';
-  $('mtitle').textContent=mm==='detail'?p.n:'예약하기';
-
+  $('mfav').textContent=fav.includes(p.id)?'❤️':'🤍';$('mfav').style.display=mm==='detail'?'block':'none';
+  $('mback').style.display=mm==='booking'?'flex':'none';$('mtitle').textContent=mm==='detail'?p.n:'예약하기';
   if(mm==='detail'){
-    const rv=RV.filter(r=>r.pid===p.id);
-    const gal=p.photos&&p.photos.length?`<div style="padding:2px 16px 4px"><div style="font-size:11px;font-weight:700;color:var(--tx);margin-bottom:6px">📸 상담 공간 갤러리</div></div><div class="gal">${p.photos.map(u=>`<img src="${u}" alt="상담공간" onerror="this.style.display='none'">`).join('')}</div>`:'';
-    const vhtml=p.vf?`<div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-top:5px"><span style="background:#ECFDF5;color:#059669;padding:3px 10px;border-radius:16px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px">✓ 인증 전문가</span></div>`:'';
+    const rv=[...RV_DB.filter(r=>r.pid===p.id),...myRv.filter(r=>r.pid===p.id).map(r=>({...r,au:lu||'나',vf:1,hl:0}))];
+    const gal=p.photos&&p.photos.length?`<div style="padding:2px 18px 4px"><div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px">📸 상담 공간 갤러리</div></div><div class="gal">${p.photos.map(u=>`<img src="${u}" alt="상담공간" onerror="this.style.display='none'">`).join('')}</div>`:'';
+    const vhtml=p.vf?`<div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-top:5px"><span style="background:#ECFDF5;color:#059669;padding:4px 12px;border-radius:18px;font-size:12px;font-weight:700">✓ 인증 전문가</span></div>`:'';
+
+    // 리뷰 작성 폼
+    const rvForm=li?`<div class="rv-form"><div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--tx)">✏️ 리뷰 작성</div><div class="rv-stars-sel" id="rv-stars">${[1,2,3,4,5].map(i=>`<button class="rv-star" onclick="setRvSc(${i})" style="color:var(--mu)">★</button>`).join('')}</div><textarea class="rv-ta" id="rv-text" placeholder="방문 후기를 작성해주세요..."></textarea><button class="rv-submit" onclick="submitRv(${p.id})">리뷰 등록</button></div>`:`<div style="margin:0 18px 14px;padding:14px;background:var(--bg2);border-radius:10px;text-align:center;font-size:13px;color:var(--mu)">리뷰를 작성하려면 로그인해주세요</div>`;
 
     $('mbody').innerHTML=`
-      <div style="text-align:center;padding:18px 0 4px">
-        <div style="font-size:40px;margin-bottom:4px">${p.ic}</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:4px">
-          <span style="font-size:9px;font-weight:600;color:${c.c};background:${cbg(p.cat)};padding:2px 8px;border-radius:10px">${c.l}</span>
-          <span style="font-size:10px;color:var(--mu)">${p.sp} · ${p.exp}</span>
-        </div>
-        ${vhtml}
-      </div>
-      <div style="margin:10px 16px;background:linear-gradient(135deg,${c.c}08,${c.c}15);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px">
-        <div style="text-align:center"><div style="font-size:32px;font-weight:800;color:${c.c};line-height:1">${p.rt}</div>${st(p.rt,13)}<div style="font-size:9px;color:var(--mu);margin-top:2px">리뷰 ${p.rv.toLocaleString()}개</div></div>
-        <div style="flex:1">${[10,8,6,4,2].map(s=>`<div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="font-size:8px;color:var(--mu);width:14px;text-align:right">${s}+</span><div style="flex:1;height:2.5px;background:var(--bd2);border-radius:2px;overflow:hidden"><div style="width:${s>=8?70:s>=6?18:s>=4?8:4}%;height:100%;background:${c.c}"></div></div></div>`).join('')}</div>
-      </div>
+      <div style="text-align:center;padding:20px 0 6px"><div style="font-size:44px;margin-bottom:6px">${p.ic}</div><div style="display:flex;align-items:center;justify-content:center;gap:5px"><span style="font-size:11px;font-weight:600;color:${c.c};background:${cbg(p.cat)};padding:3px 10px;border-radius:10px">${c.l}</span><span style="font-size:12px;color:var(--mu)">${p.sp} · ${p.exp}</span></div>${vhtml}</div>
+      <div style="margin:12px 18px;background:linear-gradient(135deg,${c.c}08,${c.c}15);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px"><div style="text-align:center"><div style="font-size:36px;font-weight:800;color:${c.c};line-height:1">${p.rt}</div>${st(p.rt,14)}<div style="font-size:11px;color:var(--mu);margin-top:2px">리뷰 ${p.rv.toLocaleString()}개</div></div><div style="flex:1">${[10,8,6,4,2].map(s=>`<div style="display:flex;align-items:center;gap:3px;margin-bottom:2px"><span style="font-size:10px;color:var(--mu);width:16px;text-align:right">${s}+</span><div style="flex:1;height:3px;background:var(--bd2);border-radius:2px;overflow:hidden"><div style="width:${s>=8?70:s>=6?18:s>=4?8:4}%;height:100%;background:${c.c}"></div></div></div>`).join('')}</div></div>
       ${gal}
-      <div class="igrid">${[["👤","전문가",p.sp],["⏰","경력",p.exp],["💰","상담비",p.prl],["📞","전화",p.ph],["🕐","영업",p.hrs],["📅","휴무",p.cls]].map(([ic,lb,vl])=>`<div class="iitem"><div class="il">${ic} ${lb}</div><div class="iv">${vl}</div></div>`).join('')}</div>
-      <div class="abox"><span style="font-size:11px;flex:1;color:var(--tx)">📍 ${p.addr}</span><button class="cpbtn" onclick="navigator.clipboard&&navigator.clipboard.writeText('${p.addr}');toast('복사됨')">복사</button></div>
-      <div style="margin:0 16px 10px;background:var(--bg2);border-radius:8px;padding:11px;transition:all .35s"><div style="font-size:11px;font-weight:600;margin-bottom:4px;color:var(--tx)">소개</div><div style="font-size:11px;color:var(--tx2);line-height:1.6">${p.desc}</div></div>
-      <div style="margin:0 16px 10px;display:flex;flex-wrap:wrap;gap:3px">${p.tags.map(t=>`<span class="tag">#${t}</span>`).join('')}</div>
-      ${rv.length?`<div style="margin:0 16px 16px"><div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--tx)">리뷰 (${rv.length})</div>${rv.map(r=>`<div class="rvcard"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;font-weight:700;color:var(--tx)">${r.au}</span>${st(r.sc,9)}${r.vf?'<span class="rv-badge">✓ 실결제</span>':''}</div><span style="font-size:9px;color:var(--mu)">${r.dt}</span></div><div style="font-size:10px;color:var(--tx2);line-height:1.5">${r.tx}</div><div style="font-size:9px;color:var(--mu);margin-top:3px">👍 ${r.hl}</div></div>`).join('')}</div>`:''}`;
+      <div class="ig">${[["👤","전문가",p.sp],["⏰","경력",p.exp],["💰","상담비",p.prl],["📞","전화",p.ph],["🕐","영업",p.hrs],["📅","휴무",p.cls]].map(([ic,lb,vl])=>`<div class="ii"><div class="il">${ic} ${lb}</div><div class="iv">${vl}</div></div>`).join('')}</div>
+      <div class="ab"><span style="font-size:13px;flex:1;color:var(--tx)">📍 ${p.addr}</span><button class="cpb" onclick="navigator.clipboard&&navigator.clipboard.writeText('${p.addr}');toast('복사됨')">복사</button></div>
+      <div style="margin:0 18px 12px;background:var(--bg2);border-radius:10px;padding:13px"><div style="font-size:13px;font-weight:600;margin-bottom:4px;color:var(--tx)">소개</div><div style="font-size:13px;color:var(--tx2);line-height:1.7">${p.desc}</div></div>
+      <div style="margin:0 18px 12px;display:flex;flex-wrap:wrap;gap:4px">${p.tags.map(t=>`<span class="tg">#${t}</span>`).join('')}</div>
+      ${rv.length?`<div style="margin:0 18px 12px"><div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--tx)">리뷰 (${rv.length})</div>${rv.map(r=>`<div class="rvc"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="display:flex;align-items:center;gap:5px"><span style="font-size:13px;font-weight:700;color:var(--tx)">${r.au}</span>${st(r.sc,11)}${r.vf?'<span class="rvb">✓ 실결제</span>':''}</div><span style="font-size:11px;color:var(--mu)">${r.dt}</span></div><div style="font-size:12px;color:var(--tx2);line-height:1.5">${r.tx}</div>${r.hl!==undefined&&r.hl>0?`<div style="font-size:11px;color:var(--mu);margin-top:3px">👍 ${r.hl}</div>`:''}</div>`).join('')}</div>`:''} 
+      ${rvForm}`;
     $('mfoot').innerHTML=`<button class="btn btn-o" onclick="toast('전화 연결 중...')">📞 전화</button><button class="btn" style="flex:2;background:${c.c};color:#fff" onclick="startB()">📅 예약하기</button>`;
-  } else rbookv();
+    // restore star UI
+    setTimeout(()=>updStars(),50);
+  } else rbv();
 }
 
-// ═══════════════════════════════════
-//  BOOKING
-// ═══════════════════════════════════
+// Review star selection
+window.setRvSc=function(n){rvScore=n;updStars();};
+function updStars(){const el=$('rv-stars');if(!el)return;el.querySelectorAll('.rv-star').forEach((b,i)=>{b.style.color=i<rvScore?'#FACC15':'var(--mu)';});}
+window.submitRv=function(pid){
+  const tx=$('rv-text').value.trim();
+  if(!rvScore)return toast('별점을 선택해주세요');
+  if(!tx)return toast('리뷰 내용을 입력해주세요');
+  const td=new Date();const ds=`${td.getFullYear()}.${String(td.getMonth()+1).padStart(2,'0')}.${String(td.getDate()).padStart(2,'0')}`;
+  myRv.push({pid,sc:rvScore*2,tx,dt:ds});
+  rvScore=0;toast('리뷰가 등록되었습니다!');rmod();
+};
+
+// ═══════ BOOKING ═══════
 window.startB=function(){if(!li){toast('로그인 필요');closeM();sw('my');return;}mm='booking';cvm=new Date();csel=new Date();btm=null;rmod();};
-function rbookv(){
-  const p=cp2;
-  $('mbody').innerHTML=`<div style="padding:12px 16px 4px"><h3 style="font-size:13px;font-weight:700;color:var(--tx)">📅 날짜 선택</h3></div><div id="calbox"></div><div style="padding:8px 16px 4px"><h3 style="font-size:12px;font-weight:700;color:var(--tx)">⏰ 시간 선택</h3></div><div class="tgrid" id="tg"></div><div class="bform" id="bf"><h3 style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--tx)">예약자 정보</h3><input class="finp" id="bn" placeholder="이름"><input class="finp" id="bp" placeholder="전화번호"><div style="background:var(--bg2);border-radius:8px;padding:11px;margin-top:3px;transition:all .35s"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--sub)">상담비</span><span style="font-size:12px;font-weight:700;color:var(--tx)">${p.prl}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--sub)">결제</span><span style="font-size:11px;font-weight:600;color:var(--tx)">간편결제</span></div></div></div>`;
-  rcal();rtg();
-  $('mfoot').innerHTML=`<button class="btn btn-b" style="flex:1" onclick="cfBook()">💳 ${p.prl} 결제하기</button>`;
-}
-function rcal(){
-  const y=cvm.getFullYear(),m=cvm.getMonth(),fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
-  const td=new Date();td.setHours(0,0,0,0);let d='';
-  for(let i=0;i<fd;i++)d+='<div></div>';
-  for(let i=1;i<=dim;i++){const dt=new Date(y,m,i);dt.setHours(0,0,0,0);const isT=dt.getTime()===td.getTime(),isS=csel&&dt.toDateString()===csel.toDateString(),isP=dt<td;d+=`<div class="cd${isT&&!isS?' today':''}${isS?' sel':''}${isP?' dis':''}" ${!isP?`onclick="selD(${y},${m},${i})"`:''} >${i}</div>`;}
-  $('calbox').innerHTML=`<div class="cal-h"><button class="cal-n" onclick="cvm.setMonth(cvm.getMonth()-1);rcal()">❮</button><div class="cal-m">${y}년 ${m+1}월</div><button class="cal-n" onclick="cvm.setMonth(cvm.getMonth()+1);rcal()">❯</button></div><div class="cal-w">${['일','월','화','수','목','금','토'].map((x,i)=>`<div style="color:${i===0?'var(--red)':i===6?'var(--tarot)':''}">${x}</div>`).join('')}</div><div class="cal-d">${d}</div>`;
-}
-window.selD=(y,m,d)=>{csel=new Date(y,m,d);btm=null;rcal();rtg();const bf=$('bf');if(bf)bf.classList.remove('on');};
-function rtg(){const el=$('tg');if(!el)return;el.innerHTML=["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"].map(t=>`<button class="tbtn${btm===t?' on':''}" onclick="selT('${t}')">${t}</button>`).join('');}
-window.selT=t=>{btm=t;rtg();const bf=$('bf');if(bf)bf.classList.add('on');$('mbody').scrollTo({top:$('mbody').scrollHeight,behavior:'smooth'});};
-window.cfBook=function(){if(!csel||!btm)return toast('날짜·시간 선택');const nm=$('bn').value,ph=$('bp').value;if(!nm||!ph)return toast('정보 입력 필요');const ds=`${csel.getFullYear()}-${String(csel.getMonth()+1).padStart(2,'0')}-${String(csel.getDate()).padStart(2,'0')}`;res.push({id:'R'+Date.now().toString().slice(-6),pid:cp2.id,n:cp2.n,dt:ds,tm:btm,pr:cp2.prl,st:'active'});const td=new Date();pay.push({id:'P'+Date.now().toString().slice(-6),n:cp2.n,dt:`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`,pr:cp2.prl,mt:'간편결제'});toast(cp2.n+' 예약 완료!');closeM();sw('my');};
+function rbv(){const p=cp2;$('mbody').innerHTML=`<div style="padding:14px 18px 6px"><h3 style="font-size:15px;font-weight:700;color:var(--tx)">📅 날짜 선택</h3></div><div id="calb"></div><div style="padding:10px 18px 6px"><h3 style="font-size:14px;font-weight:700;color:var(--tx)">⏰ 시간 선택</h3></div><div class="tgd" id="tgd"></div><div class="bf" id="bfm"><h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--tx)">예약자 정보</h3><input class="fi" id="bn" placeholder="이름"><input class="fi" id="bp" placeholder="전화번호"><div style="background:var(--bg2);border-radius:10px;padding:13px;margin-top:4px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;color:var(--sub)">상담비</span><span style="font-size:14px;font-weight:700;color:var(--tx)">${p.prl}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--sub)">결제</span><span style="font-size:13px;font-weight:600;color:var(--tx)">간편결제</span></div></div></div>`;rcl();rtg();$('mfoot').innerHTML=`<button class="btn btn-b" style="flex:1" onclick="cfB()">💳 ${p.prl} 결제하기</button>`;}
+function rcl(){const y=cvm.getFullYear(),m=cvm.getMonth(),fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),td=new Date();td.setHours(0,0,0,0);let d='';for(let i=0;i<fd;i++)d+='<div></div>';for(let i=1;i<=dim;i++){const dt=new Date(y,m,i);dt.setHours(0,0,0,0);const isT=dt.getTime()===td.getTime(),isS=csel&&dt.toDateString()===csel.toDateString(),isP=dt<td;d+=`<div class="cd${isT&&!isS?' today':''}${isS?' sel':''}${isP?' dis':''}" ${!isP?`onclick="selD(${y},${m},${i})"`:''} >${i}</div>`;}$('calb').innerHTML=`<div class="cal-h"><button class="cal-n" onclick="cvm.setMonth(cvm.getMonth()-1);rcl()">❮</button><div class="cal-m">${y}년 ${m+1}월</div><button class="cal-n" onclick="cvm.setMonth(cvm.getMonth()+1);rcl()">❯</button></div><div class="cal-w">${['일','월','화','수','목','금','토'].map((x,i)=>`<div style="color:${i===0?'var(--red)':i===6?'var(--taro)':''}">${x}</div>`).join('')}</div><div class="cal-d">${d}</div>`;}
+window.selD=(y,m,d)=>{csel=new Date(y,m,d);btm=null;rcl();rtg();const bf=$('bfm');if(bf)bf.classList.remove('on');};
+function rtg(){const el=$('tgd');if(!el)return;el.innerHTML=["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"].map(t=>`<button class="tb${btm===t?' on':''}" onclick="selT('${t}')">${t}</button>`).join('');}
+window.selT=t=>{btm=t;rtg();const bf=$('bfm');if(bf)bf.classList.add('on');$('mbody').scrollTo({top:$('mbody').scrollHeight,behavior:'smooth'});};
+window.cfB=function(){if(!csel||!btm)return toast('날짜·시간 선택');const nm=$('bn').value,ph=$('bp').value;if(!nm||!ph)return toast('정보 입력 필요');const ds=`${csel.getFullYear()}-${String(csel.getMonth()+1).padStart(2,'0')}-${String(csel.getDate()).padStart(2,'0')}`;res.push({id:'R'+Date.now().toString().slice(-6),pid:cp2.id,n:cp2.n,dt:ds,tm:btm,pr:cp2.prl,st:'active'});const td=new Date();pay.push({id:'P'+Date.now().toString().slice(-6),n:cp2.n,dt:`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`,pr:cp2.prl,mt:'간편결제'});toast(cp2.n+' 예약 완료!');closeM();sw('my');};
 
-// ═══════════════════════════════════
-//  INIT
-// ═══════════════════════════════════
+// ═══════ INIT ═══════
 rfilt();rmap();rnav();
 </script>
 </body>
