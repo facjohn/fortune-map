@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.iamport.kr/v1/iamport.js" async></script>
 <style>
 :root{--pri:#6B4EFF;--saju:#E85D3A;--sinj:#2DB67D;--taro:#3B82F6;--gwan:#F59E0B;--bg:#fff;--bg2:#F8FAFC;--bg3:#F1F5F9;--sf:#fff;--tx:#0F172A;--tx2:#475569;--sub:#64748B;--mu:#94A3B8;--bd:#F1F5F9;--bd2:#E2E8F0;--red:#EF4444;--sh:0 2px 8px rgba(0,0,0,.06);--ov:rgba(0,0,0,.5);}
 [data-theme="dark"]{--pri:#9B85FF;--bg:#0A0D1C;--bg2:#0F1328;--bg3:#171C38;--sf:#111530;--tx:#E4E2F0;--tx2:#A09CC0;--sub:#706C98;--mu:#504C78;--bd:#1A1F3A;--bd2:#252B50;--sh:0 2px 12px rgba(0,0,0,.4);--ov:rgba(4,4,16,.88);}
@@ -128,6 +129,14 @@ body{display:flex;justify-content:center;}
 .tb{padding:11px;border:1px solid var(--bd2);border-radius:10px;background:var(--sf);font-size:14px;font-weight:600;cursor:pointer;text-align:center;color:var(--tx);transition:.15s;}.tb.on{background:var(--pri);color:#fff;border-color:var(--pri);}
 .bf{padding:0 18px 18px;display:none;}.bf.on{display:block;}
 .fi{width:100%;padding:12px;border:1px solid var(--bd2);border-radius:10px;margin-bottom:8px;font-size:14px;outline:none;background:var(--bg2);color:var(--tx);transition:all .35s;}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.pm-btn{padding:12px 8px;border:2px solid var(--bd2);border-radius:12px;background:var(--sf);cursor:pointer;text-align:center;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.pm-btn.on{border-color:var(--pri);background:var(--bg2);}
+.pm-btn:active{transform:scale(.97);}
+.pm-ic{font-size:22px;}.pm-lb{font-size:12px;font-weight:600;color:var(--tx);}
+.pay-result{background:var(--bg2);border-radius:14px;padding:20px;margin:20px 18px;text-align:center;border:1px solid var(--bd2);}
+.pay-ok{color:#059669;font-size:44px;margin-bottom:8px;}
+.pay-fail{color:var(--red);font-size:44px;margin-bottom:8px;}
 
 /* TOAST */
 #toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx);color:var(--bg);padding:10px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;}
@@ -250,6 +259,11 @@ const ml=L.layerGroup().addTo(map);
 window.addEventListener('load',()=>map.invalidateSize());
 setTimeout(()=>map.invalidateSize(),100);setTimeout(()=>map.invalidateSize(),500);setTimeout(()=>map.invalidateSize(),1500);
 
+// ═══════ PORTONE (아임포트) 테스트 모드 ═══════
+// SDK가 async로 로드되므로 사용 시점에 체크
+let payMethod='card';
+function initIMP(){if(window.IMP&&!window._impReady){window.IMP.init("imp19424728");window._impReady=true;}}
+
 // ═══════ HELPERS ═══════
 const $=id=>document.getElementById(id);
 const isDk=()=>$('app').dataset.theme==='dark';
@@ -323,7 +337,7 @@ function rmy(){$('hu').textContent=li?lu:'';const el=$('v-my');
 
   el.innerHTML=`<div style="padding:18px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:17px;font-weight:800;color:var(--tx)">${lu}님, 환영합니다!</div><div style="font-size:12px;color:var(--mu);margin-top:3px">오늘도 좋은 운이 가득하길 🍀</div></div><button onclick="doLO()" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;color:var(--sub);background:var(--bg3);border:none;cursor:pointer">로그아웃</button></div>
   <h3 style="font-size:16px;font-weight:800;padding:0 18px;margin-bottom:10px;color:var(--tx)">📅 나의 예약</h3>${res.length?[...res].reverse().map(r=>`<div class="rc"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="rs ${r.st}">${r.st==='active'?'예약 확정':r.st==='completed'?'방문 완료':'예약취소'}</span><span style="font-size:11px;color:var(--mu)">#${r.id}</span></div><div style="font-size:16px;font-weight:800;margin-bottom:5px;color:var(--tx)">${r.n}</div><div style="font-size:13px;color:var(--sub)">📅 ${r.dt} ${r.tm} &nbsp; 💰 ${r.pr}</div>${r.st==='active'?`<button onclick="cRes('${r.id}')" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf);font-size:13px;font-weight:600;cursor:pointer;color:var(--red)">예약 취소</button>`:''}</div>`).join(''):'<div style="text-align:center;padding:22px;color:var(--mu);font-size:13px">예약 내역 없음</div>'}
-  <h3 style="font-size:16px;font-weight:800;padding:12px 18px 10px;color:var(--tx)">💳 결제 내역</h3>${pay.length?[...pay].reverse().map(p=>`<div class="pc"><div><div style="font-size:14px;font-weight:700;color:var(--tx)">${p.n}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">${p.dt} · ${p.mt}</div></div><div style="font-size:15px;font-weight:800;color:var(--tx)">${p.pr}</div></div>`).join(''):'<div style="text-align:center;padding:22px;color:var(--mu);font-size:13px">결제 내역 없음</div>'}
+  <h3 style="font-size:16px;font-weight:800;padding:12px 18px 10px;color:var(--tx)">💳 결제 내역</h3>${pay.length?[...pay].reverse().map(p=>`<div class="pc" style="flex-direction:column;align-items:stretch;gap:6px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:14px;font-weight:700;color:var(--tx)">${p.n}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">${p.dt} · ${p.mt}</div>${p.imp_uid?`<div style="font-size:10px;color:var(--mu);margin-top:1px">🔖 ${p.imp_uid}</div>`:''}</div><div style="font-size:15px;font-weight:800;color:var(--tx)">${p.pr}</div></div></div>`).join(''):'<div style="text-align:center;padding:22px;color:var(--mu);font-size:13px">결제 내역 없음</div>'}
   <h3 style="font-size:16px;font-weight:800;padding:12px 18px 10px;color:var(--tx)">✏️ 내 리뷰</h3>${myRvHtml}<div style="height:24px"></div>`;
 }
 window.doLI=p=>{li=true;lu=p+' 유저';rmy();toast(p+' 로그인 완료!');};
@@ -379,12 +393,116 @@ window.submitRv=function(pid){
 
 // ═══════ BOOKING ═══════
 window.startB=function(){if(!li){toast('로그인 필요');closeM();sw('my');return;}mm='booking';cvm=new Date();csel=new Date();btm=null;rmod();};
-function rbv(){const p=cp2;$('mbody').innerHTML=`<div style="padding:14px 18px 6px"><h3 style="font-size:15px;font-weight:700;color:var(--tx)">📅 날짜 선택</h3></div><div id="calb"></div><div style="padding:10px 18px 6px"><h3 style="font-size:14px;font-weight:700;color:var(--tx)">⏰ 시간 선택</h3></div><div class="tgd" id="tgd"></div><div class="bf" id="bfm"><h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--tx)">예약자 정보</h3><input class="fi" id="bn" placeholder="이름"><input class="fi" id="bp" placeholder="전화번호"><div style="background:var(--bg2);border-radius:10px;padding:13px;margin-top:4px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;color:var(--sub)">상담비</span><span style="font-size:14px;font-weight:700;color:var(--tx)">${p.prl}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--sub)">결제</span><span style="font-size:13px;font-weight:600;color:var(--tx)">간편결제</span></div></div></div>`;rcl();rtg();$('mfoot').innerHTML=`<button class="btn btn-b" style="flex:1" onclick="cfB()">💳 ${p.prl} 결제하기</button>`;}
+function rbv(){const p=cp2;payMethod='card';$('mbody').innerHTML=`<div style="padding:14px 18px 6px"><h3 style="font-size:15px;font-weight:700;color:var(--tx)">📅 날짜 선택</h3></div><div id="calb"></div><div style="padding:10px 18px 6px"><h3 style="font-size:14px;font-weight:700;color:var(--tx)">⏰ 시간 선택</h3></div><div class="tgd" id="tgd"></div><div class="bf" id="bfm"><h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--tx)">예약자 정보</h3><input class="fi" id="bn" placeholder="이름"><input class="fi" id="bp" placeholder="전화번호 (- 제외)"><h3 style="font-size:14px;font-weight:700;margin:12px 0 8px;color:var(--tx)">💳 결제 수단</h3><div class="pm-grid" id="pmg"><div class="pm-btn on" data-m="card"><span class="pm-ic">💳</span><span class="pm-lb">신용카드</span></div><div class="pm-btn" data-m="kakaopay"><span class="pm-ic">🟡</span><span class="pm-lb">카카오페이</span></div><div class="pm-btn" data-m="tosspay"><span class="pm-ic">🔵</span><span class="pm-lb">토스페이</span></div><div class="pm-btn" data-m="naverpay"><span class="pm-ic">🟢</span><span class="pm-lb">네이버페이</span></div></div><div style="background:var(--bg2);border-radius:10px;padding:13px;margin-top:4px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;color:var(--sub)">상담비</span><span style="font-size:14px;font-weight:700;color:var(--tx)">${p.prl}</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--sub)">결제수단</span><span style="font-size:13px;font-weight:600;color:var(--pri)" id="pm-label">신용카드</span></div></div><div style="margin-top:8px;padding:10px;background:#FEF3C7;border-radius:8px;font-size:11px;color:#92400E;text-align:center;line-height:1.4">🔒 포트원 테스트 모드 · 실제 결제되지 않습니다</div></div>`;rcl();rtg();
+  // 결제수단 선택 이벤트
+  $('pmg').onclick=function(e){const b=e.target.closest('.pm-btn');if(!b)return;payMethod=b.dataset.m;this.querySelectorAll('.pm-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');const labels={card:'신용카드',kakaopay:'카카오페이',tosspay:'토스페이',naverpay:'네이버페이'};$('pm-label').textContent=labels[payMethod];};
+  $('mfoot').innerHTML=`<button class="btn btn-b" style="flex:1" onclick="cfB()">💳 ${p.prl} 결제하기</button>`;}
 function rcl(){const y=cvm.getFullYear(),m=cvm.getMonth(),fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),td=new Date();td.setHours(0,0,0,0);let d='';for(let i=0;i<fd;i++)d+='<div></div>';for(let i=1;i<=dim;i++){const dt=new Date(y,m,i);dt.setHours(0,0,0,0);const isT=dt.getTime()===td.getTime(),isS=csel&&dt.toDateString()===csel.toDateString(),isP=dt<td;d+=`<div class="cd${isT&&!isS?' today':''}${isS?' sel':''}${isP?' dis':''}" ${!isP?`onclick="selD(${y},${m},${i})"`:''} >${i}</div>`;}$('calb').innerHTML=`<div class="cal-h"><button class="cal-n" onclick="cvm.setMonth(cvm.getMonth()-1);rcl()">❮</button><div class="cal-m">${y}년 ${m+1}월</div><button class="cal-n" onclick="cvm.setMonth(cvm.getMonth()+1);rcl()">❯</button></div><div class="cal-w">${['일','월','화','수','목','금','토'].map((x,i)=>`<div style="color:${i===0?'var(--red)':i===6?'var(--taro)':''}">${x}</div>`).join('')}</div><div class="cal-d">${d}</div>`;}
 window.selD=(y,m,d)=>{csel=new Date(y,m,d);btm=null;rcl();rtg();const bf=$('bfm');if(bf)bf.classList.remove('on');};
 function rtg(){const el=$('tgd');if(!el)return;el.innerHTML=["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"].map(t=>`<button class="tb${btm===t?' on':''}" onclick="selT('${t}')">${t}</button>`).join('');}
 window.selT=t=>{btm=t;rtg();const bf=$('bfm');if(bf)bf.classList.add('on');$('mbody').scrollTo({top:$('mbody').scrollHeight,behavior:'smooth'});};
-window.cfB=function(){if(!csel||!btm)return toast('날짜·시간 선택');const nm=$('bn').value,ph=$('bp').value;if(!nm||!ph)return toast('정보 입력 필요');const ds=`${csel.getFullYear()}-${String(csel.getMonth()+1).padStart(2,'0')}-${String(csel.getDate()).padStart(2,'0')}`;res.push({id:'R'+Date.now().toString().slice(-6),pid:cp2.id,n:cp2.n,dt:ds,tm:btm,pr:cp2.prl,st:'active'});const td=new Date();pay.push({id:'P'+Date.now().toString().slice(-6),n:cp2.n,dt:`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`,pr:cp2.prl,mt:'간편결제'});toast(cp2.n+' 예약 완료!');closeM();sw('my');};
+window.cfB=function(){
+  if(!csel||!btm)return toast('날짜·시간 선택');
+  const nm=$('bn').value,ph=$('bp').value;
+  if(!nm||!ph)return toast('정보 입력 필요');
+  if(!nm.trim())return toast('이름을 입력해주세요');
+  if(!/^\d{10,11}$/.test(ph.replace(/-/g,'')))return toast('올바른 전화번호를 입력해주세요');
+
+  const p=cp2;
+  const ds=`${csel.getFullYear()}-${String(csel.getMonth()+1).padStart(2,'0')}-${String(csel.getDate()).padStart(2,'0')}`;
+  const orderId='ORD_'+Date.now();
+  const pgMap={card:'html5_inicis',kakaopay:'kakaopay',tosspay:'tosspay',naverpay:'naverpay'};
+  const methodMap={card:'card',kakaopay:'kakaopay',tosspay:'tosspay',naverpay:'naverpay'};
+
+  // 포트원 결제 요청
+  initIMP();
+  if(!window.IMP||!window._impReady){
+    // SDK 로드 실패 시 폴백 (데모 모드)
+    toast('⚠️ 결제 SDK 로드 중... 데모 모드로 진행');
+    demoPayComplete(p,ds,nm,ph,orderId);
+    return;
+  }
+
+  toast('결제창을 불러오는 중...');
+
+  window.IMP.request_pay({
+    pg: pgMap[payMethod],
+    pay_method: methodMap[payMethod],
+    merchant_uid: orderId,
+    name: p.n + ' ' + CT[p.cat].l + ' 상담',
+    amount: p.pr,
+    buyer_name: nm,
+    buyer_tel: ph.replace(/-/g,''),
+    buyer_email: 'test@unmyeong.kr',
+    // 모바일 결제 후 돌아올 URL (현재 페이지)
+    m_redirect_url: window.location.href
+  }, function(rsp){
+    if(rsp.success){
+      // ✅ 결제 성공
+      paySuccess(p,ds,nm,ph,orderId,rsp);
+    } else {
+      // ❌ 결제 실패/취소
+      payFail(rsp);
+    }
+  });
+};
+
+// 결제 성공 처리
+function paySuccess(p,ds,nm,ph,orderId,rsp){
+  const td=new Date();
+  const tdStr=`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`;
+  const labels={card:'신용카드',kakaopay:'카카오페이',tosspay:'토스페이',naverpay:'네이버페이'};
+
+  // 예약 등록
+  res.push({id:orderId.slice(-8),pid:p.id,n:p.n,dt:ds,tm:btm,pr:p.prl,st:'active'});
+  // 결제 등록 (imp_uid 포함)
+  pay.push({id:rsp.imp_uid||orderId,n:p.n,dt:tdStr,pr:p.prl,mt:labels[payMethod]||'카드',imp_uid:rsp.imp_uid,merchant_uid:rsp.merchant_uid});
+
+  // 결제 성공 화면 표시
+  $('mbody').innerHTML=`
+    <div class="pay-result">
+      <div class="pay-ok">✅</div>
+      <div style="font-size:20px;font-weight:800;color:var(--tx);margin-bottom:4px">결제 완료!</div>
+      <div style="font-size:14px;color:var(--sub);margin-bottom:16px">예약이 확정되었습니다</div>
+      <div style="background:var(--sf);border-radius:12px;padding:16px;text-align:left;border:1px solid var(--bd)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--sub)">상호</span><span style="font-size:14px;font-weight:700;color:var(--tx)">${p.ic} ${p.n}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--sub)">일시</span><span style="font-size:14px;font-weight:600;color:var(--tx)">${ds} ${btm}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--sub)">예약자</span><span style="font-size:14px;font-weight:600;color:var(--tx)">${nm}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:var(--sub)">결제수단</span><span style="font-size:14px;font-weight:600;color:var(--tx)">${labels[payMethod]||'카드'}</span></div>
+        <div style="display:flex;justify-content:space-between;border-top:1px solid var(--bd);padding-top:8px;margin-top:4px"><span style="font-size:14px;font-weight:700;color:var(--sub)">결제금액</span><span style="font-size:18px;font-weight:800;color:var(--pri)">${p.prl}</span></div>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:#ECFDF5;border-radius:8px;font-size:12px;color:#059669;line-height:1.4">
+        📱 예약 확인 문자가 ${ph}로 발송됩니다<br>
+        🔖 주문번호: ${rsp.merchant_uid||orderId}
+      </div>
+      ${rsp.imp_uid?`<div style="margin-top:6px;font-size:11px;color:var(--mu)">imp_uid: ${rsp.imp_uid}</div>`:''}
+    </div>`;
+  $('mfoot').innerHTML=`<button class="btn btn-b" style="flex:1" onclick="closeM();sw('my')">확인</button>`;
+  $('mfav').style.display='none';
+  $('mback').style.display='none';
+  $('mtitle').textContent='결제 완료';
+}
+
+// 결제 실패 처리
+function payFail(rsp){
+  const msg=rsp.error_msg||'결제가 취소되었습니다';
+  $('mbody').innerHTML=`
+    <div class="pay-result">
+      <div class="pay-fail">❌</div>
+      <div style="font-size:20px;font-weight:800;color:var(--tx);margin-bottom:4px">결제 실패</div>
+      <div style="font-size:14px;color:var(--sub);margin-bottom:16px">${msg}</div>
+      <div style="padding:12px;background:#FEF2F2;border-radius:10px;font-size:12px;color:#DC2626;line-height:1.5">
+        결제가 완료되지 않았습니다.<br>다시 시도하거나 다른 결제수단을 선택해주세요.
+      </div>
+    </div>`;
+  $('mfoot').innerHTML=`<button class="btn btn-o" style="flex:1" onclick="mm='booking';rmod()">다시 시도</button><button class="btn btn-b" style="flex:1" onclick="closeM()">닫기</button>`;
+}
+
+// SDK 로드 실패 시 데모 결제
+function demoPayComplete(p,ds,nm,ph,orderId){
+  const rsp={success:true,imp_uid:'imp_demo_'+Date.now(),merchant_uid:orderId};
+  setTimeout(()=>paySuccess(p,ds,nm,ph,orderId,rsp),800);
+}
 
 // ═══════ INIT ═══════
 rfilt();rmap();rnav();
