@@ -44,7 +44,9 @@ body{display:flex;justify-content:center;}
 /* MAP */
 .ma{flex:1 1 0;min-height:0;position:relative;}
 #map{position:absolute;top:0;left:0;width:100%;height:100%;}
-.mbg{position:absolute;top:8px;left:8px;background:var(--sf);border-radius:10px;padding:7px 12px;box-shadow:var(--sh);z-index:500;font-size:13px;font-weight:700;color:var(--tx);pointer-events:none;border:1px solid var(--bd);transition:all .35s;}
+.mbg{position:absolute;top:8px;left:8px;background:var(--sf);border-radius:12px;padding:8px 12px;box-shadow:var(--sh);z-index:500;font-size:13px;font-weight:700;color:var(--tx);pointer-events:none;border:1px solid var(--bd);transition:all .35s;line-height:1.6;}
+.mbg .cc{display:inline-flex;align-items:center;gap:3px;margin-right:6px;font-size:12px;font-weight:700;}
+.mbg .cd{width:8px;height:8px;border-radius:50%;display:inline-block;}
 .leaflet-popup-content-wrapper{border-radius:14px!important;padding:0!important;box-shadow:0 4px 20px rgba(0,0,0,.15)!important;border:1px solid var(--bd2)!important;background:var(--sf)!important;}
 .leaflet-popup-content{margin:0!important;width:auto!important;min-width:230px;max-width:280px;}
 .leaflet-popup-tip{display:none;}
@@ -282,8 +284,23 @@ function rmap(){
   });
   if(ls.length>0&&ls.length<D.length)map.fitBounds(L.latLngBounds(ls.map(p=>[p.lat,p.lng])).pad(0.3),{animate:true});
   else map.setView([36.0,127.5],7,{animate:true});
-  $('mbg').innerHTML=`📍 <b>${ls.length}</b>곳 <span style="font-size:11px;color:var(--mu);margin-left:3px">${cr} · ${PR[cpi].l}</span>`;
+  $('mbg').innerHTML=mkBadge(ls);
 }
+// Category count badge
+function mkBadge(ls){
+  const cnt={saju:0,sinjeom:0,tarot:0,gwansang:0};
+  ls.forEach(p=>cnt[p.cat]=(cnt[p.cat]||0)+1);
+  const parts=Object.entries(cnt).filter(([,v])=>v>0).map(([k,v])=>`<span class="cc"><span class="cd" style="background:${CT[k].c}"></span>${CT[k].l} ${v}</span>`).join('');
+  return `📍 <b>${ls.length}</b>곳<br>${parts}`;
+}
+// Update badge on map move/zoom (shows only places in viewport)
+function updBadge(){
+  const b=map.getBounds();
+  const vis=gf().filter(p=>b.contains([p.lat,p.lng]));
+  $('mbg').innerHTML=mkBadge(vis);
+}
+map.on('moveend',updBadge);
+map.on('zoomend',updBadge);
 
 // ═══════ NAV ═══════
 function sw(v){cv=v;document.querySelectorAll('.vw').forEach(el=>el.classList.remove('on'));$('v-'+v).classList.add('on');rnav();if(v==='map'){setTimeout(()=>map.invalidateSize(),50);setTimeout(()=>map.invalidateSize(),200);}if(v==='search'){rse();$('sinp').value='';setTimeout(()=>$('sinp').focus(),100);}if(v==='wish')rwi();if(v==='my')rmy();}
