@@ -46,6 +46,16 @@ body{display:flex;justify-content:center}
 .rb{padding:5px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf);color:var(--sub);font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;transition:all .15s}.rb.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
 .pb{padding:5px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf);color:var(--sub);font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;transition:all .15s}.pb.on{background:var(--pri);color:#fff;border-color:var(--pri)}
 .ma{flex:1 1 0;min-height:0;position:relative}
+/* GPS 내위치 버튼 */
+.gps-btn{position:absolute;bottom:16px;right:12px;z-index:800;width:44px;height:44px;border-radius:50%;background:var(--sf);border:1.5px solid var(--bd2);box-shadow:0 2px 10px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:.2s;color:var(--tx)}
+.gps-btn:active{transform:scale(.9)}
+.gps-btn.on{border-color:var(--pri);color:var(--pri);background:var(--bg);box-shadow:0 2px 12px rgba(107,78,255,.3)}
+.gps-btn.loading{animation:gpsSpin 1s linear infinite}
+@keyframes gpsSpin{to{transform:rotate(360deg)}}
+/* 내 위치 파란 점 */
+.my-loc{width:16px;height:16px;background:#4285F4;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 6px rgba(66,133,244,.2),0 2px 6px rgba(0,0,0,.2)}
+.my-loc::after{content:'';position:absolute;inset:-6px;border-radius:50%;background:rgba(66,133,244,.15);animation:locPulse 2s ease-out infinite}
+@keyframes locPulse{0%{transform:scale(.8);opacity:.6}100%{transform:scale(2.2);opacity:0}}
 #map{position:absolute;top:0;left:0;width:100%;height:100%}
 .mbg{position:absolute;top:8px;left:8px;background:var(--sf);border-radius:12px;padding:8px 12px;box-shadow:var(--sh);z-index:500;font-size:13px;font-weight:700;color:var(--tx);pointer-events:none;border:1px solid var(--bd);transition:all .35s;line-height:1.6}
 .mbg .mc2{display:inline-flex;align-items:center;gap:3px;margin-right:6px;font-size:12px;font-weight:700}.mbg .mc2 i{width:8px;height:8px;border-radius:50%;display:inline-block}
@@ -161,7 +171,7 @@ body{display:flex;justify-content:center}
 <div id="app" data-theme="light">
 <div class="hd"><div class="hd-logo" id="hd-logo"><span style="font-size:22px">🔮</span><span class="hd-t">운명지도</span></div><button class="thm" id="thm">🌙</button></div>
 <div class="ct">
-  <div id="v-map" class="vw on"><div class="flt"><div class="frow" id="fc"></div><div class="rgrid" id="fr"></div><div class="frow" id="fp"></div></div><div class="ma"><div id="map"></div><div class="mbg" id="mbg"></div></div></div>
+  <div id="v-map" class="vw on"><div class="flt"><div class="frow" id="fc"></div><div class="rgrid" id="fr"></div><div class="frow" id="fp"></div></div><div class="ma"><div id="map"></div><button class="gps-btn" id="gpsBtn" onclick="getMyLoc()" title="내 위치">📍</button><div class="mbg" id="mbg"></div></div></div>
   <div id="v-search" class="vw" style="overflow-y:auto;background:var(--bg)"><div class="sw"><input type="text" id="sinp" class="sinp" placeholder="점술인, 지역, 카테고리 검색..."></div><div id="shist" style="padding:14px"></div><div id="sres" style="display:none"></div></div>
   <div id="v-wish" class="vw" style="overflow-y:auto;background:var(--bg2)"></div>
   <div id="v-my" class="vw" style="overflow-y:auto;background:var(--bg2)"></div>
@@ -309,7 +319,18 @@ const RV=[
 ];
 
 // ═══ STATE ═══
-let cc='all',cr='전국',cpi=0,cv='map',dk=false,li=false,lu='';
+let cc='all',cr='전국',cpi=0,cv='map',dk=false,li=false,lu='',lp='';
+// GPS 위치
+let myLat=0,myLng=0,myLocMarker=null;
+// localStorage에서 로그인 복원
+(function(){try{const s=localStorage.getItem('fm_login');if(s){const d=JSON.parse(s);li=true;lu=d.name||'유저';lp=d.provider||'';}}catch(e){}})();
+// Haversine 거리 계산 (km)
+function getDist(lat1,lng1,lat2,lng2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function fmtDist(km){return km<1?(Math.round(km*1000))+'m':km<10?km.toFixed(1)+'km':Math.round(km)+'km';}
 
 // ═══ GOOGLE SHEETS 연동 ═══
 // 구글 시트 API URL을 여기에 입력하세요 (Apps Script 웹앱 URL 또는 Sheets API URL)
@@ -386,6 +407,32 @@ const ml=L.layerGroup().addTo(map);
 window.addEventListener('load',()=>map.invalidateSize());
 setTimeout(()=>map.invalidateSize(),100);setTimeout(()=>map.invalidateSize(),500);setTimeout(()=>map.invalidateSize(),1500);
 
+// ═══ GPS 내 위치 ═══
+function getMyLoc(){
+  const btn=$('gpsBtn');
+  if(!navigator.geolocation){toast('위치 서비스를 지원하지 않습니다');return;}
+  btn.classList.add('loading');btn.textContent='⏳';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    myLat=pos.coords.latitude;myLng=pos.coords.longitude;
+    btn.classList.remove('loading');btn.classList.add('on');btn.textContent='📍';
+    // 내 위치 마커
+    if(myLocMarker)map.removeLayer(myLocMarker);
+    myLocMarker=L.marker([myLat,myLng],{icon:L.divIcon({className:'',html:'<div class="my-loc"></div>',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(map);
+    myLocMarker.bindPopup('<div style="text-align:center;padding:6px;font-size:13px;font-weight:700;color:var(--tx)">📍 내 위치</div>');
+    // 지역 필터에 "내 주변" 추가 (없으면)
+    if(!RG.includes('내 주변'))RG.splice(1,0,'내 주변');
+    cr='내 주변';rfilt();rmap();
+    // 광고에 거리 정보 추가 & 가까운 순 정렬
+    updateAdDist();
+    map.setView([myLat,myLng],13,{animate:true});
+    toast('📍 내 위치 기반으로 표시합니다');
+  },err=>{
+    btn.classList.remove('loading');btn.textContent='📍';
+    if(err.code===1)toast('위치 권한을 허용해주세요');
+    else toast('위치를 가져올 수 없습니다');
+  },{enableHighAccuracy:true,timeout:8000});
+}
+
 // ═══ PORTONE ═══
 function initIMP(){if(window.IMP&&!window._impOk){window.IMP.init("imp19424728");window._impOk=true;}}
 
@@ -394,7 +441,7 @@ const $=id=>document.getElementById(id);
 const cbg=c=>dk?CT[c].db:CT[c].bg;
 const st=(s,z=12)=>[1,2,3,4,5].map(i=>`<span class="${i<=Math.round(s/2)?'st':'sto'}" style="font-size:${z}px">★</span>`).join('');
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800);}
-function gf(q){const pf=PR[cpi];return D.filter(p=>{if(cc!=='all'&&p.cat!==cc)return!1;if(cr!=='전국'&&p.rg!==cr)return!1;if(p.pr<pf.a||p.pr>=pf.b)return!1;if(q&&!p.n.includes(q)&&!p.addr.includes(q)&&!p.sp.includes(q)&&!CT[p.cat].l.includes(q)&&!(p.tags&&p.tags.some(t=>t.includes(q)))&&!(p.desc&&p.desc.includes(q)))return!1;return!0;}).sort((a,b)=>b.rt-a.rt);}
+function gf(q){const pf=PR[cpi];return D.filter(p=>{if(cc!=='all'&&p.cat!==cc)return!1;if(cr==='내 주변'){if(!myLat)return!0;const d=getDist(myLat,myLng,p.lat,p.lng);if(d>30)return!1;}else if(cr!=='전국'&&p.rg!==cr)return!1;if(p.pr<pf.a||p.pr>=pf.b)return!1;if(q&&!p.n.includes(q)&&!p.addr.includes(q)&&!p.sp.includes(q)&&!CT[p.cat].l.includes(q)&&!(p.tags&&p.tags.some(t=>t.includes(q)))&&!(p.desc&&p.desc.includes(q)))return!1;return!0;}).sort((a,b)=>{if(myLat&&cr==='내 주변'){return getDist(myLat,myLng,a.lat,a.lng)-getDist(myLat,myLng,b.lat,b.lng);}return b.rt-a.rt;});}
 
 // ═══ DARK MODE ═══
 $('thm').onclick=()=>{dk=!dk;$('app').dataset.theme=dk?'dark':'light';$('thm').textContent=dk?'☀️':'🌙';rmap();};
@@ -422,14 +469,15 @@ function rmap(){
   ls.forEach(p=>{const c=CT[p.cat];const ic=L.divIcon({className:'',html:`<div class="cm" style="background:${c.c};width:38px;height:38px;font-size:17px;color:#fff">${p.ic}</div>`,iconSize:[38,38],iconAnchor:[19,38],popupAnchor:[0,-32]});
   const m=L.marker([p.lat,p.lng],{icon:ic}).addTo(ml);
   const vb=p.vf?'<span class="vb">✓ 인증</span>':'';
-  m.bindPopup(`<div style="padding:14px;color:var(--tx)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:26px">${p.ic}</span><div><div style="font-size:15px;font-weight:800">${p.n} ${vb}</div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;background:${c.bg};color:${c.c}">${c.l}</span></div></div><div style="font-size:12px;color:var(--sub);margin-bottom:5px">📍 ${p.addr}</div><div style="display:flex;align-items:center;gap:5px"><span style="font-size:20px;font-weight:800;color:var(--pri)">${p.rt}</span>${st(p.rt,13)}<span style="font-size:11px;color:var(--mu)">(${p.rv.toLocaleString()})</span></div><div style="font-size:13px;font-weight:700;color:${c.c};margin-top:4px">💰 ${p.prl} · ${p.sp}</div><button onclick="openD(${p.id})" style="display:block;width:100%;padding:10px;margin-top:8px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;background:${c.c}">상세 정보 보기</button></div>`,{maxWidth:280,closeButton:true});});
+  const dkm=myLat?getDist(myLat,myLng,p.lat,p.lng):0;const dtx=dkm?`<span style="color:#6B4EFF;font-weight:700"> · 📏 ${fmtDist(dkm)}</span>`:'';
+  m.bindPopup(`<div style="padding:14px;color:var(--tx)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:26px">${p.ic}</span><div><div style="font-size:15px;font-weight:800">${p.n} ${vb}</div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;background:${c.bg};color:${c.c}">${c.l}</span></div></div><div style="font-size:12px;color:var(--sub);margin-bottom:5px">📍 ${p.addr}${dtx}</div><div style="display:flex;align-items:center;gap:5px"><span style="font-size:20px;font-weight:800;color:var(--pri)">${p.rt}</span>${st(p.rt,13)}<span style="font-size:11px;color:var(--mu)">(${p.rv.toLocaleString()})</span></div><div style="font-size:13px;font-weight:700;color:${c.c};margin-top:4px">💰 ${p.prl} · ${p.sp}</div><button onclick="openD(${p.id})" style="display:block;width:100%;padding:10px;margin-top:8px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;background:${c.c}">상세 정보 보기</button></div>`,{maxWidth:280,closeButton:true});});
   if(ls.length>0&&ls.length<D.length)map.fitBounds(L.latLngBounds(ls.map(p=>[p.lat,p.lng])).pad(0.3),{animate:true});else map.setView([36.0,127.5],7,{animate:true});
   $('mbg').innerHTML=mkBadge(ls);
 }
 
 // ═══ NAV ═══
 function sw(v){cv=v;document.querySelectorAll('.vw').forEach(el=>el.classList.remove('on'));$('v-'+v).classList.add('on');rnav();if(v==='map'){setTimeout(()=>map.invalidateSize(),50);setTimeout(()=>map.invalidateSize(),200);}if(v==='search'){rse();$('sinp').value='';setTimeout(()=>$('sinp').focus(),100);}if(v==='wish')rwi();if(v==='my'){myView='main';rmy();}}
-function rnav(){const its=[["map","🗺️","지도"],["search","🔍","검색"],["wish","❤️","찜"],["my","👤","마이"]];$('bnav').innerHTML=its.map(([v,ic,lb])=>`<button class="nv${cv===v?' on':''}" data-v="${v}"><span class="nv-ic">${ic}</span>${lb}${v==='wish'&&fav.length?`<span class="nv-bg">${fav.length}</span>`:''}</button>`).join('');$('bnav').onclick=e=>{const b=e.target.closest('.nv');if(b)sw(b.dataset.v);};}
+function rnav(){const its=[["map","🗺️","지도"],["search","🔍","검색"],["wish","❤️","찜"],["my",li?"😊":"👤",li?lu.split(' ')[0]:"마이"]];$('bnav').innerHTML=its.map(([v,ic,lb])=>`<button class="nv${cv===v?' on':''}" data-v="${v}"><span class="nv-ic">${ic}</span>${lb}${v==='wish'&&fav.length?`<span class="nv-bg">${fav.length}</span>`:''}</button>`).join('');$('bnav').onclick=e=>{const b=e.target.closest('.nv');if(b)sw(b.dataset.v);};}
 
 // ═══ SEARCH ═══
 function rse(){$('shist').style.display='block';$('sres').style.display='none';$('shist').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:14px;font-weight:700;color:var(--tx)">최근 검색어</span><button onclick="sh=[];rse()" style="background:none;border:none;font-size:12px;color:var(--mu);cursor:pointer">전체 삭제</button></div><div>${sh.length?sh.map(h=>`<span class="stag" onclick="doS('${h}')">${h}</span>`).join(''):'<span style="font-size:13px;color:var(--mu)">검색 내역 없음</span>'}</div><div style="margin-top:22px"><div style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--tx)">🔥 인기 검색어</div>${["해운보살","천운당","관상","홍대 타로","제주 신점","설악 보살","파주 DMZ"].map((t,i)=>`<div onclick="doS('${t}')" style="padding:11px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;cursor:pointer"><span style="width:22px;text-align:center;font-size:14px;font-weight:800;color:${i<3?'var(--pri)':'var(--mu)'}">${i+1}</span><span style="font-size:14px;color:var(--tx)">${t}</span></div>`).join('')}</div>`;}
@@ -442,12 +490,12 @@ function rwi(){const el=$('v-wish');if(!fav.length){el.innerHTML=`<div style="pa
 // ═══ MY PAGE ═══
 let myView='main'; // main, inquiry, question, register
 function rmy(){const el=$('v-my');
-  if(!li){el.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:30px;background:var(--sf)"><div style="font-size:48px;margin-bottom:8px">🔮</div><div style="font-size:20px;font-weight:800;margin-bottom:4px;color:var(--tx)">운명지도 시작하기</div><div style="font-size:13px;color:var(--mu);margin-bottom:26px">로그인하고 예약·찜 기능을 이용하세요</div><button class="sb sn" onclick="doLI('네이버')"><b>N</b> 네이버로 로그인</button><button class="sb sk" onclick="doLI('카카오')"><b style='font-weight:900'>K</b> 카카오로 로그인</button><button class="sb sg" onclick="doLI('구글')"><b style='color:#EA4335'>G</b> 구글로 로그인</button><button class="sb sa" onclick="doLI('Apple')"> Apple로 로그인</button></div>`;myView='main';return;}
+  if(!li){el.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:30px;background:var(--sf)"><div style="font-size:56px;margin-bottom:6px">🔮</div><div style="font-size:22px;font-weight:900;margin-bottom:4px;color:var(--tx)">운명지도</div><div style="font-size:13px;color:var(--mu);margin-bottom:10px">당신의 운명을 찾아가는 여정</div><div style="font-size:12px;color:var(--sub);margin-bottom:24px;text-align:center;line-height:1.6">로그인하면 찜 · 예약 · 리뷰가<br>기기가 바뀌어도 유지됩니다</div><button class="sb sk" onclick="doLI('카카오')"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1C5 1 1 4.3 1 8.4c0 2.6 1.7 4.9 4.3 6.2l-1.1 4c-.1.3.3.6.5.4l4.6-3c.3 0 .5 0 .7 0 5 0 9-3.3 9-7.6S15 1 10 1z' fill='%23000'/%3E%3C/svg%3E" alt="" style="width:20px;height:20px"> 카카오로 시작하기</button><button class="sb sn" onclick="doLI('네이버')"><b style="font-size:16px">N</b> 네이버로 시작하기</button><button class="sb sg" onclick="doLI('구글')"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> 구글로 시작하기</button><button class="sb sa" onclick="doLI('Apple')"> Apple로 시작하기</button></div>`;myView='main';return;}
   if(myView==='inquiry')return rInquiry(el);
   if(myView==='question')return rQuestion(el);
   if(myView==='register')return rRegister(el);
   const myRvH=myRv.length?myRv.map(r=>{const p=D.find(x=>x.id===r.pid);return`<div class="rc" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:15px;font-weight:700;color:var(--tx)">${p?p.n:'?'} ${p?p.ic:''}</div><span style="font-size:11px;color:var(--mu)">${r.dt}</span></div><div style="margin-bottom:4px">${st(r.sc,14)}</div><div style="font-size:13px;color:var(--tx2);line-height:1.5">${r.tx}</div></div>`;}).join(''):'<div style="text-align:center;padding:20px;color:var(--mu);font-size:13px">작성한 리뷰 없음</div>';
-  el.innerHTML=`<div style="padding:18px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:17px;font-weight:800;color:var(--tx)">${lu}님</div><div style="font-size:12px;color:var(--mu);margin-top:3px">오늘도 좋은 운이 가득 🍀</div></div><button onclick="doLO()" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;color:var(--sub);background:var(--bg3);border:none;cursor:pointer">로그아웃</button></div>
+  el.innerHTML=`<div style="padding:18px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:17px;font-weight:800;color:var(--tx)">${lu}님</div><div style="font-size:12px;color:var(--mu);margin-top:3px">${lp} 로그인 · 오늘도 좋은 운이 가득 🍀</div></div><button onclick="doLO()" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;color:var(--sub);background:var(--bg3);border:none;cursor:pointer">로그아웃</button></div>
   <h3 style="font-size:16px;font-weight:800;padding:0 18px;margin-bottom:10px;color:var(--tx)">📅 나의 예약</h3>${res.length?[...res].reverse().map(r=>`<div class="rc"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="rs ${r.st}">${r.st==='active'?'예약 확정':r.st==='completed'?'방문 완료':'예약취소'}</span><span style="font-size:11px;color:var(--mu)">#${r.id}</span></div><div style="font-size:16px;font-weight:800;margin-bottom:5px;color:var(--tx)">${r.n}</div><div style="font-size:13px;color:var(--sub)">📅 ${r.dt} ${r.tm} · 💰 ${r.pr}</div>${r.st==='active'?`<button onclick="cRes('${r.id}')" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid var(--bd2);background:var(--sf);font-size:13px;font-weight:600;cursor:pointer;color:var(--red)">예약 취소</button>`:''}</div>`).join(''):'<div style="text-align:center;padding:22px;color:var(--mu);font-size:13px">예약 내역 없음</div>'}
   <h3 style="font-size:16px;font-weight:800;padding:12px 18px 10px;color:var(--tx)">💳 결제 내역</h3>${pay.length?[...pay].reverse().map(p=>`<div class="pc" style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:14px;font-weight:700;color:var(--tx)">${p.n}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">${p.dt} · ${p.mt}</div></div><div style="font-size:15px;font-weight:800;color:var(--tx)">${p.pr}</div></div>`).join(''):'<div style="text-align:center;padding:22px;color:var(--mu);font-size:13px">결제 내역 없음</div>'}
   <h3 style="font-size:16px;font-weight:800;padding:12px 18px 10px;color:var(--tx)">✏️ 내 리뷰</h3>${myRvH}
@@ -548,8 +596,8 @@ window.submitRegister=function(){
   toast('업체 등록 신청이 접수되었습니다!');
   selCatVal='';regPhotos=[];myView='inquiry';rmy();
 };
-window.doLI=p=>{li=true;lu=p+' 유저';rmy();toast(p+' 로그인 완료!');};
-window.doLO=()=>{li=false;lu='';rmy();toast('로그아웃');};
+window.doLI=p=>{li=true;lp=p;lu=p+' 유저';try{localStorage.setItem('fm_login',JSON.stringify({name:lu,provider:p}));}catch(e){}rmy();rnav();toast(p+' 로그인 완료!');};
+window.doLO=()=>{li=false;lu='';lp='';try{localStorage.removeItem('fm_login');}catch(e){}rmy();rnav();toast('로그아웃');};
 window.cRes=id=>{if(!confirm('예약을 취소하시겠습니까?'))return;res=res.map(r=>r.id===id?{...r,st:'cancelled'}:r);rmy();toast('취소됨');};
 
 // ═══ MODAL ═══
@@ -701,6 +749,19 @@ async function loadAdSheet(){
     for(let i=ADS.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ADS[i],ADS[j]]=[ADS[j],ADS[i]];}
     renderAdPeek();renderAdFull();
   }catch(e){console.warn('[광고]',e.message);}
+}
+
+// 광고 거리 업데이트 & 가까운순 정렬
+function updateAdDist(){
+  if(!myLat)return;
+  ADS.forEach(ad=>{
+    // 광고에 연결된 업체의 좌표로 거리 계산
+    const biz=ad.lid>0?D.find(d=>d.id===ad.lid)||D.find(d=>d.n===ad.n):D.find(d=>d.n===ad.n);
+    if(biz){const km=getDist(myLat,myLng,biz.lat,biz.lng);ad._dist=fmtDist(km);ad._km=km;}
+    else{ad._dist='';ad._km=999;}
+  });
+  ADS.sort((a,b)=>(a._km||999)-(b._km||999));
+  renderAdPeek();renderAdFull();
 }
 
 function renderAdPeek(){
