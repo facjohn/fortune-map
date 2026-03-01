@@ -18,6 +18,18 @@ html,body{height:100%;overflow:hidden;background:#0A0D1C}
 body{display:flex;justify-content:center}
 ::-webkit-scrollbar{width:0;height:0}
 #app{display:flex;flex-direction:column;height:100dvh;width:100%;max-width:480px;background:var(--bg);position:relative;box-shadow:0 0 40px rgba(0,0,0,.2);overflow:hidden;transition:background .35s}
+/* 스플래시 로딩 화면 */
+#splash{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#0A0D1C 0%,#1a1040 50%,#0A0D1C 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;transition:opacity .6s,visibility .6s}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+#splash .sp-icon{font-size:64px;animation:spPulse 1.5s ease-in-out infinite}
+#splash .sp-title{font-size:28px;font-weight:900;color:#fff;margin-top:14px;letter-spacing:-1px}
+#splash .sp-sub{font-size:13px;color:#9B85FF;margin-top:8px;opacity:.8}
+#splash .sp-dots{margin-top:28px;display:flex;gap:8px}
+#splash .sp-dot{width:8px;height:8px;border-radius:50%;background:#6B4EFF;animation:spDot 1.2s ease-in-out infinite}
+#splash .sp-dot:nth-child(2){animation-delay:.2s}
+#splash .sp-dot:nth-child(3){animation-delay:.4s}
+@keyframes spPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.15);filter:brightness(1.4) drop-shadow(0 0 20px rgba(107,78,255,.6))}}
+@keyframes spDot{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 .hd{height:50px;min-height:50px;padding:0 16px;background:var(--sf);display:flex;align-items:center;border-bottom:1px solid var(--bd);z-index:100;transition:all .35s}
 .hd-logo{display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .hd-t{font-size:19px;font-weight:800;background:linear-gradient(135deg,var(--pri),#E85D3A);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -99,9 +111,53 @@ body{display:flex;justify-content:center}
 .pay-result{background:var(--bg2);border-radius:14px;padding:20px;margin:20px 18px;text-align:center;border:1px solid var(--bd2)}
 #toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx);color:var(--bg);padding:10px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .st{color:#FACC15}.sto{color:var(--mu)}
+
+/* ═══ 홍보 패널 ═══ */
+.ad-panel{position:relative;z-index:90;background:var(--sf);border-top:1px solid var(--bd);transition:all .35s;overflow:hidden}
+.ad-peek{position:relative;cursor:pointer;padding:10px 14px 6px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.ad-shimmer{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(107,78,255,.06) 50%,transparent 70%);background-size:200% 100%;animation:adShimmer 3s ease-in-out infinite}
+@keyframes adShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ad-peek-inner{display:flex;gap:10px;align-items:center;position:relative;z-index:1}
+.ad-peek-img{width:52px;height:52px;border-radius:12px;object-fit:cover;border:2px solid var(--pri);flex-shrink:0;animation:adGlow 2.5s ease-in-out infinite}
+@keyframes adGlow{0%,100%{box-shadow:0 0 4px rgba(107,78,255,.3)}50%{box-shadow:0 0 14px rgba(107,78,255,.6)}}
+.ad-peek-info{flex:1;min-width:0}
+.ad-peek-name{font-size:14px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:5px}
+.ad-peek-name .ad-badge{font-size:9px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--pri),#E85D3A);padding:2px 7px;border-radius:6px;animation:adPulse 2s ease-in-out infinite;white-space:nowrap}
+@keyframes adPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.85;transform:scale(1.05)}}
+.ad-peek-loc{font-size:11px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-peek-desc{font-size:12px;color:var(--tx2);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.ad-handle{display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 0 2px;position:relative;z-index:1}
+.ad-handle-dot{width:3px;height:3px;border-radius:50%;background:var(--pri);animation:adPulse 2s ease-in-out infinite}
+.ad-label{font-size:10px;font-weight:700;color:var(--pri);letter-spacing:.5px}
+
+/* 펼침 상태 */
+.ad-panel.open .ad-full{max-height:70vh;padding:0 14px 14px;opacity:1}
+.ad-panel.open .ad-peek-inner{display:none}
+.ad-panel.open .ad-shimmer{display:none}
+.ad-panel.open .ad-label::after{content:'  ▼'}
+.ad-panel:not(.open) .ad-label::after{content:'  ▲'}
+.ad-full{max-height:0;opacity:0;overflow-y:auto;transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s,padding .3s;padding:0 14px}
+.ad-card{display:flex;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;margin-bottom:8px;cursor:pointer;border:1px solid var(--bd);transition:all .2s;position:relative;overflow:hidden}
+.ad-card:active{transform:scale(.98)}
+.ad-card::before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,rgba(107,78,255,.04) 55%,transparent 70%);background-size:250% 100%;animation:adShimmer 4s ease-in-out infinite}
+.ad-card-img{width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--bd2);position:relative;z-index:1}
+.ad-card-body{flex:1;min-width:0;position:relative;z-index:1}
+.ad-card-name{font-size:14px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:5px}
+.ad-card-cat{font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px}
+.ad-card-loc{font-size:11px;color:var(--sub);margin-top:2px}
+.ad-card-desc{font-size:12px;color:var(--tx2);margin-top:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
+.ad-card-price{font-size:12px;font-weight:700;color:var(--pri);margin-top:3px}
+.ad-rank{position:absolute;top:6px;right:8px;font-size:9px;font-weight:800;color:var(--pri);background:var(--bg);padding:2px 6px;border-radius:6px;border:1px solid var(--bd);z-index:2}
 </style>
 </head>
 <body>
+<!-- 스플래시 로딩 화면 -->
+<div id="splash">
+  <div class="sp-icon">🔮</div>
+  <div class="sp-title">운명지도</div>
+  <div class="sp-sub">당신의 운명을 찾아가는 여정</div>
+  <div class="sp-dots"><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div></div>
+</div>
 <div id="app" data-theme="light">
 <div class="hd"><div class="hd-logo" id="hd-logo"><span style="font-size:22px">🔮</span><span class="hd-t">운명지도</span></div><button class="thm" id="thm">🌙</button></div>
 <div class="ct">
@@ -109,6 +165,15 @@ body{display:flex;justify-content:center}
   <div id="v-search" class="vw" style="overflow-y:auto;background:var(--bg)"><div class="sw"><input type="text" id="sinp" class="sinp" placeholder="점술인, 지역, 카테고리 검색..."></div><div id="shist" style="padding:14px"></div><div id="sres" style="display:none"></div></div>
   <div id="v-wish" class="vw" style="overflow-y:auto;background:var(--bg2)"></div>
   <div id="v-my" class="vw" style="overflow-y:auto;background:var(--bg2)"></div>
+</div>
+<!-- 홍보 패널 -->
+<div id="adPanel" class="ad-panel">
+  <div class="ad-peek" id="adPeek" onclick="toggleAd()">
+    <div class="ad-shimmer"></div>
+    <div class="ad-peek-inner" id="adPeekInner"></div>
+    <div class="ad-handle"><span class="ad-handle-dot"></span><span class="ad-label">✨ 추천 신당 보기</span><span class="ad-handle-dot"></span></div>
+  </div>
+  <div class="ad-full" id="adFull"></div>
 </div>
 <div class="bnav" id="bnav"></div>
 <div id="mo"><div class="modal-c"><div class="mh"><button class="cb" id="mback" style="display:none">←</button><div class="mt" id="mtitle"></div><button class="fvb" id="mfav">🤍</button><button class="cb" id="mcl">✕</button></div><div class="mb" id="mbody"></div><div class="mf" id="mfoot"></div></div></div>
@@ -121,126 +186,126 @@ const RG=["전국","서울","경기","부산","대구","인천","광주","대전
 const PR=[{l:"전체",a:0,b:1e8},{l:"1만 미만",a:0,b:10000},{l:"1~3만",a:10000,b:30000},{l:"3~5만",a:30000,b:50000},{l:"5~7만",a:50000,b:70000},{l:"7~10만",a:70000,b:100000},{l:"10만 이상",a:100000,b:1e8}];
 const PH={a:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop"],b:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=300&h=200&fit=crop"],c:["https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=300&h=200&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=200&fit=crop"],d:["https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=300&h=200&fit=crop"],e:[]};
 const D=[
-{id:1,n:"천운당",cat:"saju",rg:"서울",lat:37.5715,lng:126.986,addr:"서울 종로구 인사동길 42",rt:9.2,rv:847,pr:60000,prl:"6만원",sp:"김천운",exp:"32년",desc:"3대째 이어온 전통 사주 명가.",tags:["정확함","친절","예약필수"],ph:"02-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🏛️",vf:1,photos:PH.a},
-{id:2,n:"명리학당",cat:"saju",rg:"서울",lat:37.5013,lng:127.0396,addr:"서울 강남구 테헤란로 156",rt:8.8,rv:623,pr:70000,prl:"7만원",sp:"박명리",exp:"25년",desc:"현대적 감각의 사주 해석.",tags:["사업운","재물운","직장운"],ph:"02-2345-6789",hrs:"11:00-21:00",cls:"월요일",ic:"📖",vf:1,photos:PH.b},
-{id:3,n:"신령당",cat:"sinjeom",rg:"서울",lat:37.5568,lng:126.9106,addr:"서울 마포구 망원동 72-3",rt:9.5,rv:1203,pr:120000,prl:"12만원",sp:"신령보살",exp:"40년",desc:"전국에서 찾아오는 용한 무당.",tags:["용하다","소름","신기함"],ph:"02-3456-7890",hrs:"09:00-18:00",cls:"수요일",ic:"🔮",vf:1,photos:PH.c},
-{id:4,n:"달빛타로",cat:"tarot",rg:"서울",lat:37.5563,lng:126.9237,addr:"서울 홍대입구 어울마당로 52",rt:8.5,rv:456,pr:30000,prl:"3만원",sp:"Luna",exp:"8년",desc:"감성적 공간에서 타로 리딩.",tags:["감성적","연애운","분위기좋음"],ph:"02-4567-8901",hrs:"13:00-22:00",cls:"화요일",ic:"🌙",vf:0,photos:PH.b},
-{id:5,n:"해운보살",cat:"sinjeom",rg:"부산",lat:35.1587,lng:129.1601,addr:"부산 해운대구 중동 1543",rt:9.7,rv:2105,pr:80000,prl:"8만원",sp:"해운보살",exp:"45년",desc:"부산 최고의 신점. 45년 전설.",tags:["전설","정확함","줄서서감"],ph:"051-1234-5678",hrs:"08:00-17:00",cls:"일요일",ic:"🌊",vf:1,photos:PH.a},
-{id:6,n:"팔공산 도사",cat:"saju",rg:"대구",lat:35.8714,lng:128.6014,addr:"대구 동구 팔공산로 185",rt:8.9,rv:534,pr:50000,prl:"5만원",sp:"팔공도사",exp:"35년",desc:"팔공산 자락에서 수행한 도사님.",tags:["산속","수행자"],ph:"053-1234-5678",hrs:"10:00-16:00",cls:"토,일",ic:"⛰️",vf:1,photos:PH.d},
-{id:7,n:"빛고을 타로",cat:"tarot",rg:"광주",lat:35.146,lng:126.9186,addr:"광주 동구 충장로 87",rt:8.3,rv:312,pr:25000,prl:"2.5만원",sp:"별이",exp:"6년",desc:"광주 핫플 타로샵.",tags:["핫플","SNS유명"],ph:"062-1234-5678",hrs:"12:00-21:00",cls:"월요일",ic:"✨",vf:0,photos:PH.d},
-{id:8,n:"은하수 사주",cat:"saju",rg:"대전",lat:36.3504,lng:127.3845,addr:"대전 서구 둔산동 1587",rt:8.6,rv:289,pr:40000,prl:"4만원",sp:"은하선생",exp:"20년",desc:"논리적인 사주 해석.",tags:["논리적","과학적"],ph:"042-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🌌",vf:1,photos:PH.d},
-{id:9,n:"제주 해신당",cat:"sinjeom",rg:"제주",lat:33.394,lng:126.2396,addr:"제주 한림읍 협재리",rt:9.1,rv:678,pr:70000,prl:"7만원",sp:"해신보살",exp:"30년",desc:"제주 바다의 기운을 받은 신점.",tags:["제주여행","바다기운"],ph:"064-1234-5678",hrs:"09:00-17:00",cls:"수요일",ic:"🏝️",vf:1,photos:PH.c},
-{id:10,n:"춘천 달타로",cat:"tarot",rg:"강원",lat:37.8813,lng:127.7298,addr:"춘천시 명동길 24",rt:8.1,rv:198,pr:20000,prl:"2만원",sp:"달빛",exp:"5년",desc:"아늑한 타로카페.",tags:["카페","아늑함"],ph:"033-1234-5678",hrs:"11:00-20:00",cls:"화요일",ic:"🍵",vf:0,photos:PH.e},
-{id:11,n:"수원 점술관",cat:"saju",rg:"경기",lat:37.2886,lng:127.0015,addr:"수원 팔달구 화성행궁로 21",rt:8.4,rv:345,pr:45000,prl:"4.5만원",sp:"화성도사",exp:"22년",desc:"수원화성 근처 전통 점술관.",tags:["전통","관광지"],ph:"031-1234-5678",hrs:"10:00-18:00",cls:"월요일",ic:"🏯",vf:1,photos:PH.d},
-{id:12,n:"한옥 신점",cat:"sinjeom",rg:"전주",lat:35.8151,lng:127.153,addr:"전주 한옥마을길 55",rt:9.0,rv:567,pr:60000,prl:"6만원",sp:"한옥보살",exp:"28년",desc:"한옥마을에서 전통 방식의 신점.",tags:["한옥마을","전통방식"],ph:"063-1234-5678",hrs:"09:00-18:00",cls:"일요일",ic:"🏡",vf:1,photos:PH.b},
-{id:13,n:"울산 태화",cat:"saju",rg:"울산",lat:35.5537,lng:129.3114,addr:"울산 중구 태화동",rt:8.2,rv:210,pr:40000,prl:"4만원",sp:"태화선생",exp:"18년",desc:"태화강변 사주 상담.",tags:["조용함","강변"],ph:"052-1234-5678",hrs:"10:00-18:00",cls:"토요일",ic:"🌿",vf:0,photos:PH.e},
-{id:14,n:"강릉 동해 점집",cat:"sinjeom",rg:"강원",lat:37.796,lng:128.896,addr:"강릉시 경포로 398",rt:8.7,rv:401,pr:50000,prl:"5만원",sp:"동해보살",exp:"33년",desc:"동해 기운의 용한 점집.",tags:["동해기운","경포대"],ph:"033-2345-6789",hrs:"08:00-17:00",cls:"일요일",ic:"🌅",vf:1,photos:PH.d},
-{id:15,n:"종로 백운관상",cat:"gwansang",rg:"서울",lat:37.57,lng:126.983,addr:"서울 종로구 관철동 14-5",rt:9.0,rv:389,pr:50000,prl:"5만원",sp:"백운선생",exp:"28년",desc:"인상학의 대가.",tags:["관상명인","TV출연"],ph:"02-5678-1234",hrs:"10:00-18:00",cls:"일요일",ic:"🎭",vf:1,photos:PH.c},
-{id:16,n:"서면 얼굴명가",cat:"gwansang",rg:"부산",lat:35.153,lng:129.0596,addr:"부산 서면로 68",rt:8.7,rv:267,pr:40000,prl:"4만원",sp:"김관상",exp:"15년",desc:"MZ세대 인기 관상.",tags:["MZ인기","현대적"],ph:"051-5678-1234",hrs:"11:00-20:00",cls:"월요일",ic:"👁️",vf:0,photos:PH.d},
-{id:17,n:"길거리 타로",cat:"tarot",rg:"서울",lat:37.555,lng:126.926,addr:"서울 마포구 어울마당로",rt:7.8,rv:891,pr:5000,prl:"5천원",sp:"타로요정",exp:"2년",desc:"가볍게 즐기는 힐링 타로.",tags:["가성비","재미"],ph:"-",hrs:"15:00-22:00",cls:"비올때",ic:"🎪",vf:0,photos:PH.e},
-{id:18,n:"분당 빛가람",cat:"saju",rg:"경기",lat:37.3827,lng:127.1189,addr:"경기 성남시 분당구",rt:8.9,rv:320,pr:20000,prl:"2만원",sp:"이연리",exp:"5년",desc:"학생·취준생 합리적 사주.",tags:["학생할인","합리적"],ph:"031-9876-5432",hrs:"10:00-20:00",cls:"수요일",ic:"🌳",vf:0,photos:PH.d},
-{id:19,n:"세종 하늘보살",cat:"sinjeom",rg:"대전",lat:36.501,lng:127.002,addr:"세종시 조치원읍",rt:8.5,rv:178,pr:55000,prl:"5.5만원",sp:"하늘보살",exp:"22년",desc:"세종 지역 유일의 신점 명소.",tags:["세종유일","정확"],ph:"044-1234-5678",hrs:"09:00-17:00",cls:"일요일",ic:"☁️",vf:1,photos:PH.e},
-{id:20,n:"인천 차이나 관상",cat:"gwansang",rg:"인천",lat:37.475,lng:126.618,addr:"인천 차이나타운로 45",rt:8.3,rv:234,pr:35000,prl:"3.5만원",sp:"왕선생",exp:"20년",desc:"중국 전통 관상학 정통 풀이.",tags:["중국식","독특"],ph:"032-1234-5678",hrs:"10:00-19:00",cls:"화요일",ic:"🐉",vf:0,photos:PH.d},
-{id:21,n:"이태원 미스틱타로",cat:"tarot",rg:"서울",lat:37.5345,lng:126.994,addr:"서울 용산구 이태원로 180",rt:8.4,rv:534,pr:35000,prl:"3.5만원",sp:"미스틱",exp:"7년",desc:"영어 가능 타로샵.",tags:["영어가능","감성"],ph:"02-7890-1234",hrs:"14:00-23:00",cls:"월요일",ic:"🌟",vf:0,photos:PH.b},
-{id:22,n:"용산 천기당",cat:"saju",rg:"서울",lat:37.529,lng:126.965,addr:"서울 용산구 한강대로 95",rt:9.1,rv:432,pr:80000,prl:"8만원",sp:"천기도사",exp:"38년",desc:"풍수지리와 사주를 결합한 독보적 상담.",tags:["풍수지리","VIP"],ph:"02-8901-2345",hrs:"10:00-18:00",cls:"토,일",ic:"🐲",vf:1,photos:PH.a},
-{id:23,n:"해남 땅끝 신당",cat:"sinjeom",rg:"전남",lat:34.294,lng:126.608,addr:"해남군 송지면 땅끝마을",rt:9.3,rv:445,pr:60000,prl:"6만원",sp:"땅끝보살",exp:"35년",desc:"한반도 최남단 강력 신점.",tags:["땅끝마을","강력"],ph:"061-1234-5678",hrs:"08:00-16:00",cls:"일요일",ic:"🌅",vf:1,photos:PH.c},
-{id:24,n:"안동 하회 점술",cat:"saju",rg:"경북",lat:36.566,lng:128.729,addr:"안동시 풍천면 하회리",rt:8.8,rv:312,pr:45000,prl:"4.5만원",sp:"하회선생",exp:"26년",desc:"하회마을의 전통 사주.",tags:["전통","유교"],ph:"054-1234-5678",hrs:"10:00-17:00",cls:"월요일",ic:"🎎",vf:1,photos:PH.d},
-{id:25,n:"김해 가야 관상",cat:"gwansang",rg:"경남",lat:35.228,lng:128.889,addr:"김해시 가야의길 102",rt:8.1,rv:189,pr:30000,prl:"3만원",sp:"가야선생",exp:"12년",desc:"가야 문화의 관상 해석.",tags:["가야","독특"],ph:"055-1234-5678",hrs:"10:00-18:00",cls:"화요일",ic:"👑",vf:0,photos:PH.d},
-{id:26,n:"속초 설악 보살",cat:"sinjeom",rg:"강원",lat:38.19,lng:128.59,addr:"속초시 설악동 452",rt:9.0,rv:521,pr:65000,prl:"6.5만원",sp:"설악보살",exp:"30년",desc:"설악산의 영기를 받은 신점.",tags:["설악산","영기"],ph:"033-3456-7890",hrs:"07:00-16:00",cls:"수요일",ic:"🏔️",vf:1,photos:PH.c},
-{id:27,n:"여수 밤바다 타로",cat:"tarot",rg:"전남",lat:34.76,lng:127.662,addr:"여수시 돌산대교 앞",rt:8.2,rv:287,pr:25000,prl:"2.5만원",sp:"밤바다",exp:"4년",desc:"여수 바다를 보며 타로 리딩.",tags:["야경","로맨틱"],ph:"061-2345-6789",hrs:"16:00-24:00",cls:"화요일",ic:"🌃",vf:0,photos:PH.b},
-{id:28,n:"청주 무심천 사주",cat:"saju",rg:"충북",lat:36.634,lng:127.489,addr:"청주시 상당구 무심천로",rt:8.5,rv:267,pr:35000,prl:"3.5만원",sp:"무심선생",exp:"15년",desc:"청주 무심천 옆 사주 전문.",tags:["청주","합리적"],ph:"043-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"💧",vf:1,photos:PH.d},
-{id:29,n:"포항 호미곶 신점",cat:"sinjeom",rg:"경북",lat:36.077,lng:129.567,addr:"포항시 남구 호미곶면",rt:8.9,rv:356,pr:55000,prl:"5.5만원",sp:"호미보살",exp:"25년",desc:"해돋이 기운의 신점.",tags:["해돋이","최동단"],ph:"054-2345-6789",hrs:"05:00-15:00",cls:"수요일",ic:"☀️",vf:1,photos:PH.c},
-{id:30,n:"일산 라벤더 타로",cat:"tarot",rg:"경기",lat:37.658,lng:126.77,addr:"고양시 일산서구 주엽동",rt:8.0,rv:412,pr:15000,prl:"1.5만원",sp:"라벤더",exp:"3년",desc:"아로마 힐링 타로.",tags:["힐링","아로마"],ph:"031-4567-8901",hrs:"12:00-21:00",cls:"월요일",ic:"💜",vf:0,photos:PH.d},
-{id:31,n:"목포 유달산 보살",cat:"sinjeom",rg:"전남",lat:34.786,lng:126.385,addr:"목포시 유달산길 88",rt:9.2,rv:489,pr:70000,prl:"7만원",sp:"유달보살",exp:"32년",desc:"목포 유달산의 영험한 신점.",tags:["유달산","전설"],ph:"061-3456-7890",hrs:"08:00-17:00",cls:"일요일",ic:"⛩️",vf:1,photos:PH.c},
-{id:32,n:"경주 천년 관상",cat:"gwansang",rg:"경북",lat:35.856,lng:129.224,addr:"경주시 황남동 포석로",rt:8.6,rv:298,pr:45000,prl:"4.5만원",sp:"천년선생",exp:"22년",desc:"신라 천년의 관상학.",tags:["경주","역사"],ph:"054-3456-7890",hrs:"10:00-18:00",cls:"화요일",ic:"🏺",vf:1,photos:PH.d},
-{id:33,n:"원주 치악산 도사",cat:"saju",rg:"강원",lat:37.35,lng:127.95,addr:"원주시 행구동 치악산로",rt:8.7,rv:234,pr:50000,prl:"5만원",sp:"치악도사",exp:"28년",desc:"치악산 수행 도사의 사주.",tags:["치악산","수행"],ph:"033-4567-8901",hrs:"09:00-16:00",cls:"토,일",ic:"🌲",vf:1,photos:PH.d},
-{id:34,n:"부천 판타지 타로",cat:"tarot",rg:"경기",lat:37.504,lng:126.766,addr:"부천시 원미구 상동",rt:7.9,rv:567,pr:10000,prl:"1만원",sp:"판타지",exp:"3년",desc:"만화의 도시 부천의 유니크 타로.",tags:["유니크","저렴"],ph:"032-4567-8901",hrs:"13:00-22:00",cls:"수요일",ic:"🦄",vf:0,photos:PH.e},
-{id:35,n:"창원 마산 신당",cat:"sinjeom",rg:"경남",lat:35.182,lng:128.572,addr:"창원시 마산합포구 해안대로",rt:8.8,rv:378,pr:60000,prl:"6만원",sp:"마산보살",exp:"27년",desc:"마산항 바다 기운의 신당.",tags:["마산항","정확"],ph:"055-2345-6789",hrs:"08:00-17:00",cls:"일요일",ic:"⚓",vf:1,photos:PH.c},
-{id:36,n:"양평 힐링 사주",cat:"saju",rg:"경기",lat:37.491,lng:127.488,addr:"양평군 양평읍 시장길",rt:8.3,rv:156,pr:30000,prl:"3만원",sp:"양평선생",exp:"10년",desc:"자연 속 힐링 사주.",tags:["힐링","자연"],ph:"031-5678-9012",hrs:"10:00-18:00",cls:"월요일",ic:"🌾",vf:0,photos:PH.d},
-{id:37,n:"천안 온양 관상",cat:"gwansang",rg:"충남",lat:36.815,lng:127.114,addr:"천안시 동남구 신부동",rt:8.4,rv:212,pr:35000,prl:"3.5만원",sp:"온양선생",exp:"16년",desc:"온양온천 근처 관상 전문.",tags:["온양온천","친절"],ph:"041-1234-5678",hrs:"10:00-19:00",cls:"화요일",ic:"♨️",vf:0,photos:PH.d},
-{id:38,n:"광명동굴 타로",cat:"tarot",rg:"경기",lat:37.418,lng:126.866,addr:"광명시 가학동 광명동굴",rt:8.1,rv:345,pr:20000,prl:"2만원",sp:"동굴요정",exp:"4년",desc:"동굴 속 신비 타로 체험.",tags:["동굴","체험"],ph:"02-6789-0123",hrs:"11:00-20:00",cls:"월요일",ic:"🕯️",vf:0,photos:PH.b},
-{id:39,n:"순천 정원 보살",cat:"sinjeom",rg:"전남",lat:34.95,lng:127.487,addr:"순천시 국가정원길",rt:8.9,rv:334,pr:55000,prl:"5.5만원",sp:"정원보살",exp:"24년",desc:"순천만 정원 옆 자연 신점.",tags:["순천만","자연"],ph:"061-4567-8901",hrs:"09:00-17:00",cls:"수요일",ic:"🌸",vf:1,photos:PH.c},
-{id:40,n:"파주 DMZ 영술",cat:"sinjeom",rg:"경기",lat:37.895,lng:126.78,addr:"파주시 문산읍 임진각로",rt:8.6,rv:267,pr:65000,prl:"6.5만원",sp:"임진보살",exp:"20년",desc:"분단의 기운이 서린 강력 영술.",tags:["DMZ","강력"],ph:"031-6789-0123",hrs:"08:00-16:00",cls:"일요일",ic:"🕊️",vf:1,photos:PH.d}
+{id:1001,n:"천운당",cat:"saju",rg:"서울",lat:37.5715,lng:126.986,addr:"서울 종로구 인사동길 42",rt:9.2,rv:847,pr:60000,prl:"6만원",sp:"김천운",exp:"32년",desc:"3대째 이어온 전통 사주 명가.",tags:["정확함","친절","예약필수"],ph:"02-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🏛️",vf:1,photos:PH.a},
+{id:1002,n:"명리학당",cat:"saju",rg:"서울",lat:37.5013,lng:127.0396,addr:"서울 강남구 테헤란로 156",rt:8.8,rv:623,pr:70000,prl:"7만원",sp:"박명리",exp:"25년",desc:"현대적 감각의 사주 해석.",tags:["사업운","재물운","직장운"],ph:"02-2345-6789",hrs:"11:00-21:00",cls:"월요일",ic:"📖",vf:1,photos:PH.b},
+{id:1003,n:"신령당",cat:"sinjeom",rg:"서울",lat:37.5568,lng:126.9106,addr:"서울 마포구 망원동 72-3",rt:9.5,rv:1203,pr:120000,prl:"12만원",sp:"신령보살",exp:"40년",desc:"전국에서 찾아오는 용한 무당.",tags:["용하다","소름","신기함"],ph:"02-3456-7890",hrs:"09:00-18:00",cls:"수요일",ic:"🔮",vf:1,photos:PH.c},
+{id:1004,n:"달빛타로",cat:"tarot",rg:"서울",lat:37.5563,lng:126.9237,addr:"서울 홍대입구 어울마당로 52",rt:8.5,rv:456,pr:30000,prl:"3만원",sp:"Luna",exp:"8년",desc:"감성적 공간에서 타로 리딩.",tags:["감성적","연애운","분위기좋음"],ph:"02-4567-8901",hrs:"13:00-22:00",cls:"화요일",ic:"🌙",vf:0,photos:PH.b},
+{id:1005,n:"해운보살",cat:"sinjeom",rg:"부산",lat:35.1587,lng:129.1601,addr:"부산 해운대구 중동 1543",rt:9.7,rv:2105,pr:80000,prl:"8만원",sp:"해운보살",exp:"45년",desc:"부산 최고의 신점. 45년 전설.",tags:["전설","정확함","줄서서감"],ph:"051-1234-5678",hrs:"08:00-17:00",cls:"일요일",ic:"🌊",vf:1,photos:PH.a},
+{id:1006,n:"팔공산 도사",cat:"saju",rg:"대구",lat:35.8714,lng:128.6014,addr:"대구 동구 팔공산로 185",rt:8.9,rv:534,pr:50000,prl:"5만원",sp:"팔공도사",exp:"35년",desc:"팔공산 자락에서 수행한 도사님.",tags:["산속","수행자"],ph:"053-1234-5678",hrs:"10:00-16:00",cls:"토,일",ic:"⛰️",vf:1,photos:PH.d},
+{id:1007,n:"빛고을 타로",cat:"tarot",rg:"광주",lat:35.146,lng:126.9186,addr:"광주 동구 충장로 87",rt:8.3,rv:312,pr:25000,prl:"2.5만원",sp:"별이",exp:"6년",desc:"광주 핫플 타로샵.",tags:["핫플","SNS유명"],ph:"062-1234-5678",hrs:"12:00-21:00",cls:"월요일",ic:"✨",vf:0,photos:PH.d},
+{id:1008,n:"은하수 사주",cat:"saju",rg:"대전",lat:36.3504,lng:127.3845,addr:"대전 서구 둔산동 1587",rt:8.6,rv:289,pr:40000,prl:"4만원",sp:"은하선생",exp:"20년",desc:"논리적인 사주 해석.",tags:["논리적","과학적"],ph:"042-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"🌌",vf:1,photos:PH.d},
+{id:1009,n:"제주 해신당",cat:"sinjeom",rg:"제주",lat:33.394,lng:126.2396,addr:"제주 한림읍 협재리",rt:9.1,rv:678,pr:70000,prl:"7만원",sp:"해신보살",exp:"30년",desc:"제주 바다의 기운을 받은 신점.",tags:["제주여행","바다기운"],ph:"064-1234-5678",hrs:"09:00-17:00",cls:"수요일",ic:"🏝️",vf:1,photos:PH.c},
+{id:1010,n:"춘천 달타로",cat:"tarot",rg:"강원",lat:37.8813,lng:127.7298,addr:"춘천시 명동길 24",rt:8.1,rv:198,pr:20000,prl:"2만원",sp:"달빛",exp:"5년",desc:"아늑한 타로카페.",tags:["카페","아늑함"],ph:"033-1234-5678",hrs:"11:00-20:00",cls:"화요일",ic:"🍵",vf:0,photos:PH.e},
+{id:1011,n:"수원 점술관",cat:"saju",rg:"경기",lat:37.2886,lng:127.0015,addr:"수원 팔달구 화성행궁로 21",rt:8.4,rv:345,pr:45000,prl:"4.5만원",sp:"화성도사",exp:"22년",desc:"수원화성 근처 전통 점술관.",tags:["전통","관광지"],ph:"031-1234-5678",hrs:"10:00-18:00",cls:"월요일",ic:"🏯",vf:1,photos:PH.d},
+{id:1012,n:"한옥 신점",cat:"sinjeom",rg:"전주",lat:35.8151,lng:127.153,addr:"전주 한옥마을길 55",rt:9.0,rv:567,pr:60000,prl:"6만원",sp:"한옥보살",exp:"28년",desc:"한옥마을에서 전통 방식의 신점.",tags:["한옥마을","전통방식"],ph:"063-1234-5678",hrs:"09:00-18:00",cls:"일요일",ic:"🏡",vf:1,photos:PH.b},
+{id:1013,n:"울산 태화",cat:"saju",rg:"울산",lat:35.5537,lng:129.3114,addr:"울산 중구 태화동",rt:8.2,rv:210,pr:40000,prl:"4만원",sp:"태화선생",exp:"18년",desc:"태화강변 사주 상담.",tags:["조용함","강변"],ph:"052-1234-5678",hrs:"10:00-18:00",cls:"토요일",ic:"🌿",vf:0,photos:PH.e},
+{id:1014,n:"강릉 동해 점집",cat:"sinjeom",rg:"강원",lat:37.796,lng:128.896,addr:"강릉시 경포로 398",rt:8.7,rv:401,pr:50000,prl:"5만원",sp:"동해보살",exp:"33년",desc:"동해 기운의 용한 점집.",tags:["동해기운","경포대"],ph:"033-2345-6789",hrs:"08:00-17:00",cls:"일요일",ic:"🌅",vf:1,photos:PH.d},
+{id:1015,n:"종로 백운관상",cat:"gwansang",rg:"서울",lat:37.57,lng:126.983,addr:"서울 종로구 관철동 14-5",rt:9.0,rv:389,pr:50000,prl:"5만원",sp:"백운선생",exp:"28년",desc:"인상학의 대가.",tags:["관상명인","TV출연"],ph:"02-5678-1234",hrs:"10:00-18:00",cls:"일요일",ic:"🎭",vf:1,photos:PH.c},
+{id:1016,n:"서면 얼굴명가",cat:"gwansang",rg:"부산",lat:35.153,lng:129.0596,addr:"부산 서면로 68",rt:8.7,rv:267,pr:40000,prl:"4만원",sp:"김관상",exp:"15년",desc:"MZ세대 인기 관상.",tags:["MZ인기","현대적"],ph:"051-5678-1234",hrs:"11:00-20:00",cls:"월요일",ic:"👁️",vf:0,photos:PH.d},
+{id:1017,n:"길거리 타로",cat:"tarot",rg:"서울",lat:37.555,lng:126.926,addr:"서울 마포구 어울마당로",rt:7.8,rv:891,pr:5000,prl:"5천원",sp:"타로요정",exp:"2년",desc:"가볍게 즐기는 힐링 타로.",tags:["가성비","재미"],ph:"-",hrs:"15:00-22:00",cls:"비올때",ic:"🎪",vf:0,photos:PH.e},
+{id:1018,n:"분당 빛가람",cat:"saju",rg:"경기",lat:37.3827,lng:127.1189,addr:"경기 성남시 분당구",rt:8.9,rv:320,pr:20000,prl:"2만원",sp:"이연리",exp:"5년",desc:"학생·취준생 합리적 사주.",tags:["학생할인","합리적"],ph:"031-9876-5432",hrs:"10:00-20:00",cls:"수요일",ic:"🌳",vf:0,photos:PH.d},
+{id:1019,n:"세종 하늘보살",cat:"sinjeom",rg:"대전",lat:36.501,lng:127.002,addr:"세종시 조치원읍",rt:8.5,rv:178,pr:55000,prl:"5.5만원",sp:"하늘보살",exp:"22년",desc:"세종 지역 유일의 신점 명소.",tags:["세종유일","정확"],ph:"044-1234-5678",hrs:"09:00-17:00",cls:"일요일",ic:"☁️",vf:1,photos:PH.e},
+{id:1020,n:"인천 차이나 관상",cat:"gwansang",rg:"인천",lat:37.475,lng:126.618,addr:"인천 차이나타운로 45",rt:8.3,rv:234,pr:35000,prl:"3.5만원",sp:"왕선생",exp:"20년",desc:"중국 전통 관상학 정통 풀이.",tags:["중국식","독특"],ph:"032-1234-5678",hrs:"10:00-19:00",cls:"화요일",ic:"🐉",vf:0,photos:PH.d},
+{id:1021,n:"이태원 미스틱타로",cat:"tarot",rg:"서울",lat:37.5345,lng:126.994,addr:"서울 용산구 이태원로 180",rt:8.4,rv:534,pr:35000,prl:"3.5만원",sp:"미스틱",exp:"7년",desc:"영어 가능 타로샵.",tags:["영어가능","감성"],ph:"02-7890-1234",hrs:"14:00-23:00",cls:"월요일",ic:"🌟",vf:0,photos:PH.b},
+{id:1022,n:"용산 천기당",cat:"saju",rg:"서울",lat:37.529,lng:126.965,addr:"서울 용산구 한강대로 95",rt:9.1,rv:432,pr:80000,prl:"8만원",sp:"천기도사",exp:"38년",desc:"풍수지리와 사주를 결합한 독보적 상담.",tags:["풍수지리","VIP"],ph:"02-8901-2345",hrs:"10:00-18:00",cls:"토,일",ic:"🐲",vf:1,photos:PH.a},
+{id:1023,n:"해남 땅끝 신당",cat:"sinjeom",rg:"전남",lat:34.294,lng:126.608,addr:"해남군 송지면 땅끝마을",rt:9.3,rv:445,pr:60000,prl:"6만원",sp:"땅끝보살",exp:"35년",desc:"한반도 최남단 강력 신점.",tags:["땅끝마을","강력"],ph:"061-1234-5678",hrs:"08:00-16:00",cls:"일요일",ic:"🌅",vf:1,photos:PH.c},
+{id:1024,n:"안동 하회 점술",cat:"saju",rg:"경북",lat:36.566,lng:128.729,addr:"안동시 풍천면 하회리",rt:8.8,rv:312,pr:45000,prl:"4.5만원",sp:"하회선생",exp:"26년",desc:"하회마을의 전통 사주.",tags:["전통","유교"],ph:"054-1234-5678",hrs:"10:00-17:00",cls:"월요일",ic:"🎎",vf:1,photos:PH.d},
+{id:1025,n:"김해 가야 관상",cat:"gwansang",rg:"경남",lat:35.228,lng:128.889,addr:"김해시 가야의길 102",rt:8.1,rv:189,pr:30000,prl:"3만원",sp:"가야선생",exp:"12년",desc:"가야 문화의 관상 해석.",tags:["가야","독특"],ph:"055-1234-5678",hrs:"10:00-18:00",cls:"화요일",ic:"👑",vf:0,photos:PH.d},
+{id:1026,n:"속초 설악 보살",cat:"sinjeom",rg:"강원",lat:38.19,lng:128.59,addr:"속초시 설악동 452",rt:9.0,rv:521,pr:65000,prl:"6.5만원",sp:"설악보살",exp:"30년",desc:"설악산의 영기를 받은 신점.",tags:["설악산","영기"],ph:"033-3456-7890",hrs:"07:00-16:00",cls:"수요일",ic:"🏔️",vf:1,photos:PH.c},
+{id:1027,n:"여수 밤바다 타로",cat:"tarot",rg:"전남",lat:34.76,lng:127.662,addr:"여수시 돌산대교 앞",rt:8.2,rv:287,pr:25000,prl:"2.5만원",sp:"밤바다",exp:"4년",desc:"여수 바다를 보며 타로 리딩.",tags:["야경","로맨틱"],ph:"061-2345-6789",hrs:"16:00-24:00",cls:"화요일",ic:"🌃",vf:0,photos:PH.b},
+{id:1028,n:"청주 무심천 사주",cat:"saju",rg:"충북",lat:36.634,lng:127.489,addr:"청주시 상당구 무심천로",rt:8.5,rv:267,pr:35000,prl:"3.5만원",sp:"무심선생",exp:"15년",desc:"청주 무심천 옆 사주 전문.",tags:["청주","합리적"],ph:"043-1234-5678",hrs:"10:00-19:00",cls:"일요일",ic:"💧",vf:1,photos:PH.d},
+{id:1029,n:"포항 호미곶 신점",cat:"sinjeom",rg:"경북",lat:36.077,lng:129.567,addr:"포항시 남구 호미곶면",rt:8.9,rv:356,pr:55000,prl:"5.5만원",sp:"호미보살",exp:"25년",desc:"해돋이 기운의 신점.",tags:["해돋이","최동단"],ph:"054-2345-6789",hrs:"05:00-15:00",cls:"수요일",ic:"☀️",vf:1,photos:PH.c},
+{id:1030,n:"일산 라벤더 타로",cat:"tarot",rg:"경기",lat:37.658,lng:126.77,addr:"고양시 일산서구 주엽동",rt:8.0,rv:412,pr:15000,prl:"1.5만원",sp:"라벤더",exp:"3년",desc:"아로마 힐링 타로.",tags:["힐링","아로마"],ph:"031-4567-8901",hrs:"12:00-21:00",cls:"월요일",ic:"💜",vf:0,photos:PH.d},
+{id:1031,n:"목포 유달산 보살",cat:"sinjeom",rg:"전남",lat:34.786,lng:126.385,addr:"목포시 유달산길 88",rt:9.2,rv:489,pr:70000,prl:"7만원",sp:"유달보살",exp:"32년",desc:"목포 유달산의 영험한 신점.",tags:["유달산","전설"],ph:"061-3456-7890",hrs:"08:00-17:00",cls:"일요일",ic:"⛩️",vf:1,photos:PH.c},
+{id:1032,n:"경주 천년 관상",cat:"gwansang",rg:"경북",lat:35.856,lng:129.224,addr:"경주시 황남동 포석로",rt:8.6,rv:298,pr:45000,prl:"4.5만원",sp:"천년선생",exp:"22년",desc:"신라 천년의 관상학.",tags:["경주","역사"],ph:"054-3456-7890",hrs:"10:00-18:00",cls:"화요일",ic:"🏺",vf:1,photos:PH.d},
+{id:1033,n:"원주 치악산 도사",cat:"saju",rg:"강원",lat:37.35,lng:127.95,addr:"원주시 행구동 치악산로",rt:8.7,rv:234,pr:50000,prl:"5만원",sp:"치악도사",exp:"28년",desc:"치악산 수행 도사의 사주.",tags:["치악산","수행"],ph:"033-4567-8901",hrs:"09:00-16:00",cls:"토,일",ic:"🌲",vf:1,photos:PH.d},
+{id:1034,n:"부천 판타지 타로",cat:"tarot",rg:"경기",lat:37.504,lng:126.766,addr:"부천시 원미구 상동",rt:7.9,rv:567,pr:10000,prl:"1만원",sp:"판타지",exp:"3년",desc:"만화의 도시 부천의 유니크 타로.",tags:["유니크","저렴"],ph:"032-4567-8901",hrs:"13:00-22:00",cls:"수요일",ic:"🦄",vf:0,photos:PH.e},
+{id:1035,n:"창원 마산 신당",cat:"sinjeom",rg:"경남",lat:35.182,lng:128.572,addr:"창원시 마산합포구 해안대로",rt:8.8,rv:378,pr:60000,prl:"6만원",sp:"마산보살",exp:"27년",desc:"마산항 바다 기운의 신당.",tags:["마산항","정확"],ph:"055-2345-6789",hrs:"08:00-17:00",cls:"일요일",ic:"⚓",vf:1,photos:PH.c},
+{id:1036,n:"양평 힐링 사주",cat:"saju",rg:"경기",lat:37.491,lng:127.488,addr:"양평군 양평읍 시장길",rt:8.3,rv:156,pr:30000,prl:"3만원",sp:"양평선생",exp:"10년",desc:"자연 속 힐링 사주.",tags:["힐링","자연"],ph:"031-5678-9012",hrs:"10:00-18:00",cls:"월요일",ic:"🌾",vf:0,photos:PH.d},
+{id:1037,n:"천안 온양 관상",cat:"gwansang",rg:"충남",lat:36.815,lng:127.114,addr:"천안시 동남구 신부동",rt:8.4,rv:212,pr:35000,prl:"3.5만원",sp:"온양선생",exp:"16년",desc:"온양온천 근처 관상 전문.",tags:["온양온천","친절"],ph:"041-1234-5678",hrs:"10:00-19:00",cls:"화요일",ic:"♨️",vf:0,photos:PH.d},
+{id:1038,n:"광명동굴 타로",cat:"tarot",rg:"경기",lat:37.418,lng:126.866,addr:"광명시 가학동 광명동굴",rt:8.1,rv:345,pr:20000,prl:"2만원",sp:"동굴요정",exp:"4년",desc:"동굴 속 신비 타로 체험.",tags:["동굴","체험"],ph:"02-6789-0123",hrs:"11:00-20:00",cls:"월요일",ic:"🕯️",vf:0,photos:PH.b},
+{id:1039,n:"순천 정원 보살",cat:"sinjeom",rg:"전남",lat:34.95,lng:127.487,addr:"순천시 국가정원길",rt:8.9,rv:334,pr:55000,prl:"5.5만원",sp:"정원보살",exp:"24년",desc:"순천만 정원 옆 자연 신점.",tags:["순천만","자연"],ph:"061-4567-8901",hrs:"09:00-17:00",cls:"수요일",ic:"🌸",vf:1,photos:PH.c},
+{id:1040,n:"파주 DMZ 영술",cat:"sinjeom",rg:"경기",lat:37.895,lng:126.78,addr:"파주시 문산읍 임진각로",rt:8.6,rv:267,pr:65000,prl:"6.5만원",sp:"임진보살",exp:"20년",desc:"분단의 기운이 서린 강력 영술.",tags:["DMZ","강력"],ph:"031-6789-0123",hrs:"08:00-16:00",cls:"일요일",ic:"🕊️",vf:1,photos:PH.d}
 ];
 
 const RV=[
-{pid:1,au:"민지",dt:"2025.12.15",sc:10,tx:"소름끼칠 정도로 정확했어요. 이직 시기도 딱 맞춰주셨습니다.",hl:234,vf:1},
-{pid:1,au:"현우",dt:"2025.11.28",sc:9,tx:"사주풀이가 매우 논리적이고 구체적입니다.",hl:156,vf:1},
-{pid:1,au:"수아",dt:"2025.10.05",sc:10,tx:"3대째 이어온 곳이라 풀이의 깊이가 남달라요.",hl:312,vf:1},
-{pid:1,au:"준혁",dt:"2025.09.20",sc:8,tx:"예약이 힘들지만 기다릴 만한 가치가 있습니다.",hl:89,vf:1},
-{pid:1,au:"하린",dt:"2026.01.10",sc:9,tx:"친구 소개로 갔는데 정말 정확해서 놀랐어요.",hl:145,vf:0},
-{pid:2,au:"도윤",dt:"2025.12.08",sc:9,tx:"강남에서 이 가격이면 합리적. 사업운 상담 최고.",hl:178,vf:1},
-{pid:2,au:"서윤",dt:"2025.11.15",sc:8,tx:"직장 문제로 상담받았는데 방향을 잡았어요.",hl:92,vf:1},
-{pid:2,au:"민준",dt:"2026.01.22",sc:9,tx:"투자 시기 상담이 정확했습니다.",hl:201,vf:1},
-{pid:3,au:"지은",dt:"2025.12.20",sc:10,tx:"이름도 안 말했는데 가족 상황을 다 맞추셨어요.",hl:567,vf:1},
-{pid:3,au:"태민",dt:"2025.12.01",sc:10,tx:"반신반의하고 갔다가 인생관이 바뀌었습니다.",hl:312,vf:0},
-{pid:3,au:"유진",dt:"2025.11.10",sc:10,tx:"TV에서 보고 갔는데 직접 보니 더 대단하세요.",hl:445,vf:1},
-{pid:3,au:"시현",dt:"2025.10.25",sc:9,tx:"무섭기도 했지만 정확해서 인정할 수밖에.",hl:278,vf:1},
-{pid:3,au:"은서",dt:"2026.02.01",sc:10,tx:"신내림 받으신 분이라 영적 감각이 다릅니다.",hl:189,vf:1},
-{pid:4,au:"채원",dt:"2025.12.18",sc:8,tx:"홍대 분위기와 잘 어울려요. 연애운 적중!",hl:167,vf:1},
-{pid:4,au:"지호",dt:"2025.11.30",sc:7,tx:"분위기는 좋은데 해석은 좀 아쉬웠어요.",hl:34,vf:0},
-{pid:4,au:"소율",dt:"2026.01.15",sc:9,tx:"진로 고민이 해결됐어요. Luna님 감사!",hl:123,vf:1},
-{pid:5,au:"서연",dt:"2025.12.18",sc:10,tx:"부산 여행 중 들렀는데 인생 점집입니다.",hl:445,vf:1},
-{pid:5,au:"도현",dt:"2025.12.05",sc:10,tx:"새벽 5시에 줄 섰는데 그만한 가치가 있었어요.",hl:389,vf:1},
-{pid:5,au:"예린",dt:"2025.11.20",sc:10,tx:"45년 경력은 다릅니다. 한 마디가 소름.",hl:534,vf:1},
-{pid:5,au:"우진",dt:"2025.10.10",sc:10,tx:"전국에서 찾아오는 이유가 있어요.",hl:612,vf:1},
-{pid:5,au:"나연",dt:"2026.01.28",sc:9,tx:"대기가 길지만 정확합니다.",hl:78,vf:1},
-{pid:6,au:"수현",dt:"2025.12.12",sc:9,tx:"산속에서 수행하신 분이라 기운이 달라요.",hl:145,vf:1},
-{pid:6,au:"지원",dt:"2025.11.05",sc:9,tx:"대구 가면 꼭 들러야 할 사주 명소.",hl:189,vf:1},
-{pid:7,au:"하율",dt:"2025.12.22",sc:8,tx:"SNS에서 보고 갔는데 가성비 좋아요!",hl:112,vf:1},
-{pid:7,au:"이준",dt:"2026.01.08",sc:8,tx:"별이님 타로가 감성적이고 위로가 돼요.",hl:87,vf:0},
-{pid:8,au:"윤서",dt:"2025.12.10",sc:8,tx:"논리적 해석이 인상적. 미신 싫어하는 분도 OK.",hl:156,vf:1},
-{pid:8,au:"시윤",dt:"2026.01.18",sc:9,tx:"과학적 접근이라 납득이 갔어요.",hl:134,vf:1},
-{pid:9,au:"지수",dt:"2025.12.16",sc:9,tx:"제주 여행보다 이게 더 기억에 남아요.",hl:201,vf:1},
-{pid:9,au:"하영",dt:"2025.11.25",sc:10,tx:"바다 기운이 진짜 느껴져요. 신비로운 경험.",hl:267,vf:1},
-{pid:9,au:"준서",dt:"2026.01.05",sc:9,tx:"해신당이라는 이름답게 바다 기운이 강렬.",hl:145,vf:1},
-{pid:10,au:"소민",dt:"2025.12.28",sc:8,tx:"따뜻한 차와 함께하는 타로. 힐링.",hl:78,vf:1},
-{pid:11,au:"재민",dt:"2025.12.05",sc:8,tx:"화성행궁 관광 후 들렀는데 전통 느낌 좋아요.",hl:112,vf:1},
-{pid:11,au:"유나",dt:"2026.01.12",sc:9,tx:"22년 경력답게 안정적이고 정확한 풀이.",hl:98,vf:1},
-{pid:12,au:"시우",dt:"2025.12.11",sc:9,tx:"한옥마을 분위기와 어울려서 특별했어요.",hl:178,vf:0},
-{pid:12,au:"다인",dt:"2025.11.18",sc:9,tx:"전통 방식 신점. 한복까지 입으시니 몰입감 최고.",hl:234,vf:1},
-{pid:12,au:"건호",dt:"2026.02.05",sc:10,tx:"전주 여행의 하이라이트. 강추!",hl:156,vf:1},
-{pid:14,au:"수빈A",dt:"2025.12.15",sc:9,tx:"경포대 바다 보고 신점 보고. 완벽 코스.",hl:145,vf:1},
-{pid:14,au:"민서",dt:"2026.01.20",sc:8,tx:"동해 기운을 느끼며 상담받는 특별 경험.",hl:89,vf:1},
-{pid:15,au:"예진",dt:"2025.12.22",sc:10,tx:"관상으로 성격을 다 맞추셔서 놀랐어요.",hl:290,vf:1},
-{pid:15,au:"은찬",dt:"2025.11.30",sc:9,tx:"인상학의 대가. 얼굴만 보고 직업 맞추심.",hl:345,vf:1},
-{pid:15,au:"주원",dt:"2026.01.25",sc:10,tx:"TV에서 보던 분을 직접 만나니 감동.",hl:212,vf:1},
-{pid:16,au:"하은B",dt:"2025.12.20",sc:8,tx:"MZ 감성의 관상 풀이. 재미있고 공감됨.",hl:134,vf:1},
-{pid:16,au:"지안",dt:"2026.02.01",sc:9,tx:"관상으로 연애 스타일을 맞추셔서 ㅋㅋ",hl:178,vf:0},
-{pid:17,au:"하은",dt:"2025.12.25",sc:8,tx:"5천원에 이 정도면 가성비 미쳤어요!",hl:445,vf:1},
-{pid:17,au:"태양",dt:"2025.12.30",sc:7,tx:"가볍게 재미로 보기 좋아요.",hl:56,vf:0},
-{pid:17,au:"세아",dt:"2026.01.15",sc:8,tx:"친구들이랑 같이 보면 재밌어요!",hl:234,vf:1},
-{pid:18,au:"은수",dt:"2025.12.15",sc:8,tx:"학생이라 부담없는 가격이 좋았어요.",hl:78,vf:1},
-{pid:18,au:"태호",dt:"2026.01.20",sc:9,tx:"취준생인데 방향 잡는 데 도움 됐어요.",hl:112,vf:1},
-{pid:21,au:"미래",dt:"2026.01.12",sc:8,tx:"영어로 타로 가능! 외국인 친구와 갔어요.",hl:167,vf:1},
-{pid:22,au:"성진",dt:"2026.01.10",sc:9,tx:"풍수지리까지 봐주시니 깊이가 다릅니다.",hl:123,vf:1},
-{pid:22,au:"현진",dt:"2025.12.28",sc:10,tx:"대기업 임원들이 찾는 이유가 있어요.",hl:267,vf:1},
-{pid:23,au:"소영",dt:"2026.01.18",sc:10,tx:"최남단 기운. 정말 강력했어요.",hl:198,vf:1},
-{pid:23,au:"재윤",dt:"2025.12.15",sc:9,tx:"땅끝마을 여행 중 최고의 경험.",hl:156,vf:1},
-{pid:24,au:"은비",dt:"2025.12.20",sc:9,tx:"유교적 해석이 독특하고 새로웠어요.",hl:134,vf:1},
-{pid:26,au:"다희",dt:"2026.01.05",sc:10,tx:"설악산 영기가 진짜인 것 같아요.",hl:278,vf:1},
-{pid:26,au:"우빈",dt:"2025.12.10",sc:9,tx:"새벽에 설악산 올라가서 기도하신대요.",hl:189,vf:1},
-{pid:26,au:"채린",dt:"2026.02.08",sc:10,tx:"속초 여행 하이라이트! 꼭 가보세요.",hl:145,vf:1},
-{pid:27,au:"별이",dt:"2025.12.28",sc:8,tx:"여수 밤바다 보면서 타로. 로맨틱해요.",hl:189,vf:1},
-{pid:28,au:"진아",dt:"2026.01.15",sc:8,tx:"무심천 옆이라 산책하다 들르기 좋아요.",hl:67,vf:1},
-{pid:29,au:"정훈",dt:"2025.12.18",sc:9,tx:"해돋이 보고 신점 보니 기운이 확 달라요.",hl:167,vf:1},
-{pid:29,au:"나윤",dt:"2026.01.25",sc:9,tx:"새벽 5시 오픈이라 해돋이랑 같이!",hl:134,vf:1},
-{pid:30,au:"보미",dt:"2025.12.20",sc:7,tx:"아로마 향 좋아요. 가볍게 즐기기 좋음.",hl:56,vf:1},
-{pid:31,au:"재혁",dt:"2026.01.15",sc:10,tx:"유달산 보살님 정말 용하세요.",hl:312,vf:1},
-{pid:31,au:"다온",dt:"2025.12.22",sc:10,tx:"목포 여행의 진짜 목적이 여기였어요.",hl:245,vf:1},
-{pid:32,au:"시율",dt:"2026.01.08",sc:9,tx:"신라 천년의 관상학. 독특하고 정확.",hl:156,vf:1},
-{pid:32,au:"하람",dt:"2025.12.30",sc:8,tx:"경주 여행 중 특별한 체험. 추천!",hl:112,vf:1},
-{pid:33,au:"동현",dt:"2025.12.25",sc:9,tx:"치악산 수행자답게 통찰력이 깊어요.",hl:145,vf:1},
-{pid:34,au:"태우",dt:"2026.01.08",sc:7,tx:"만화 컨셉이 재밌어요. 유니크.",hl:89,vf:0},
-{pid:35,au:"수빈B",dt:"2026.01.20",sc:9,tx:"마산 바다 기운이 느껴지는 특별 경험.",hl:187,vf:1},
-{pid:35,au:"한결",dt:"2025.12.15",sc:8,tx:"항구 도시 신당. 분위기가 독특.",hl:98,vf:1},
-{pid:36,au:"소담",dt:"2025.12.30",sc:8,tx:"양평 자연 속 여유로운 상담.",hl:78,vf:1},
-{pid:37,au:"예은",dt:"2026.01.22",sc:8,tx:"온양온천 후 관상 보니 힐링 코스.",hl:112,vf:1},
-{pid:38,au:"시후",dt:"2025.12.18",sc:8,tx:"동굴 안 타로는 여기뿐! 신비로워요.",hl:145,vf:1},
-{pid:39,au:"서진",dt:"2026.01.28",sc:9,tx:"순천만 옆 자연 속 힐링 신점.",hl:134,vf:1},
-{pid:39,au:"유빈",dt:"2025.12.20",sc:10,tx:"정원 보살님 너무 따뜻해요.",hl:189,vf:1},
-{pid:40,au:"현서",dt:"2026.02.05",sc:9,tx:"분단의 기운. 영적 감각이 강렬.",hl:167,vf:1},
-{pid:40,au:"아인",dt:"2025.12.28",sc:8,tx:"임진각 근처라 특별한 느낌.",hl:89,vf:1}
+{pid:1001,au:"민지",dt:"2025.12.15",sc:10,tx:"소름끼칠 정도로 정확했어요. 이직 시기도 딱 맞춰주셨습니다.",hl:234,vf:1},
+{pid:1001,au:"현우",dt:"2025.11.28",sc:9,tx:"사주풀이가 매우 논리적이고 구체적입니다.",hl:156,vf:1},
+{pid:1001,au:"수아",dt:"2025.10.05",sc:10,tx:"3대째 이어온 곳이라 풀이의 깊이가 남달라요.",hl:312,vf:1},
+{pid:1001,au:"준혁",dt:"2025.09.20",sc:8,tx:"예약이 힘들지만 기다릴 만한 가치가 있습니다.",hl:89,vf:1},
+{pid:1001,au:"하린",dt:"2026.01.10",sc:9,tx:"친구 소개로 갔는데 정말 정확해서 놀랐어요.",hl:145,vf:0},
+{pid:1002,au:"도윤",dt:"2025.12.08",sc:9,tx:"강남에서 이 가격이면 합리적. 사업운 상담 최고.",hl:178,vf:1},
+{pid:1002,au:"서윤",dt:"2025.11.15",sc:8,tx:"직장 문제로 상담받았는데 방향을 잡았어요.",hl:92,vf:1},
+{pid:1002,au:"민준",dt:"2026.01.22",sc:9,tx:"투자 시기 상담이 정확했습니다.",hl:201,vf:1},
+{pid:1003,au:"지은",dt:"2025.12.20",sc:10,tx:"이름도 안 말했는데 가족 상황을 다 맞추셨어요.",hl:567,vf:1},
+{pid:1003,au:"태민",dt:"2025.12.01",sc:10,tx:"반신반의하고 갔다가 인생관이 바뀌었습니다.",hl:312,vf:0},
+{pid:1003,au:"유진",dt:"2025.11.10",sc:10,tx:"TV에서 보고 갔는데 직접 보니 더 대단하세요.",hl:445,vf:1},
+{pid:1003,au:"시현",dt:"2025.10.25",sc:9,tx:"무섭기도 했지만 정확해서 인정할 수밖에.",hl:278,vf:1},
+{pid:1003,au:"은서",dt:"2026.02.01",sc:10,tx:"신내림 받으신 분이라 영적 감각이 다릅니다.",hl:189,vf:1},
+{pid:1004,au:"채원",dt:"2025.12.18",sc:8,tx:"홍대 분위기와 잘 어울려요. 연애운 적중!",hl:167,vf:1},
+{pid:1004,au:"지호",dt:"2025.11.30",sc:7,tx:"분위기는 좋은데 해석은 좀 아쉬웠어요.",hl:34,vf:0},
+{pid:1004,au:"소율",dt:"2026.01.15",sc:9,tx:"진로 고민이 해결됐어요. Luna님 감사!",hl:123,vf:1},
+{pid:1005,au:"서연",dt:"2025.12.18",sc:10,tx:"부산 여행 중 들렀는데 인생 점집입니다.",hl:445,vf:1},
+{pid:1005,au:"도현",dt:"2025.12.05",sc:10,tx:"새벽 5시에 줄 섰는데 그만한 가치가 있었어요.",hl:389,vf:1},
+{pid:1005,au:"예린",dt:"2025.11.20",sc:10,tx:"45년 경력은 다릅니다. 한 마디가 소름.",hl:534,vf:1},
+{pid:1005,au:"우진",dt:"2025.10.10",sc:10,tx:"전국에서 찾아오는 이유가 있어요.",hl:612,vf:1},
+{pid:1005,au:"나연",dt:"2026.01.28",sc:9,tx:"대기가 길지만 정확합니다.",hl:78,vf:1},
+{pid:1006,au:"수현",dt:"2025.12.12",sc:9,tx:"산속에서 수행하신 분이라 기운이 달라요.",hl:145,vf:1},
+{pid:1006,au:"지원",dt:"2025.11.05",sc:9,tx:"대구 가면 꼭 들러야 할 사주 명소.",hl:189,vf:1},
+{pid:1007,au:"하율",dt:"2025.12.22",sc:8,tx:"SNS에서 보고 갔는데 가성비 좋아요!",hl:112,vf:1},
+{pid:1007,au:"이준",dt:"2026.01.08",sc:8,tx:"별이님 타로가 감성적이고 위로가 돼요.",hl:87,vf:0},
+{pid:1008,au:"윤서",dt:"2025.12.10",sc:8,tx:"논리적 해석이 인상적. 미신 싫어하는 분도 OK.",hl:156,vf:1},
+{pid:1008,au:"시윤",dt:"2026.01.18",sc:9,tx:"과학적 접근이라 납득이 갔어요.",hl:134,vf:1},
+{pid:1009,au:"지수",dt:"2025.12.16",sc:9,tx:"제주 여행보다 이게 더 기억에 남아요.",hl:201,vf:1},
+{pid:1009,au:"하영",dt:"2025.11.25",sc:10,tx:"바다 기운이 진짜 느껴져요. 신비로운 경험.",hl:267,vf:1},
+{pid:1009,au:"준서",dt:"2026.01.05",sc:9,tx:"해신당이라는 이름답게 바다 기운이 강렬.",hl:145,vf:1},
+{pid:1010,au:"소민",dt:"2025.12.28",sc:8,tx:"따뜻한 차와 함께하는 타로. 힐링.",hl:78,vf:1},
+{pid:1011,au:"재민",dt:"2025.12.05",sc:8,tx:"화성행궁 관광 후 들렀는데 전통 느낌 좋아요.",hl:112,vf:1},
+{pid:1011,au:"유나",dt:"2026.01.12",sc:9,tx:"22년 경력답게 안정적이고 정확한 풀이.",hl:98,vf:1},
+{pid:1012,au:"시우",dt:"2025.12.11",sc:9,tx:"한옥마을 분위기와 어울려서 특별했어요.",hl:178,vf:0},
+{pid:1012,au:"다인",dt:"2025.11.18",sc:9,tx:"전통 방식 신점. 한복까지 입으시니 몰입감 최고.",hl:234,vf:1},
+{pid:1012,au:"건호",dt:"2026.02.05",sc:10,tx:"전주 여행의 하이라이트. 강추!",hl:156,vf:1},
+{pid:1014,au:"수빈A",dt:"2025.12.15",sc:9,tx:"경포대 바다 보고 신점 보고. 완벽 코스.",hl:145,vf:1},
+{pid:1014,au:"민서",dt:"2026.01.20",sc:8,tx:"동해 기운을 느끼며 상담받는 특별 경험.",hl:89,vf:1},
+{pid:1015,au:"예진",dt:"2025.12.22",sc:10,tx:"관상으로 성격을 다 맞추셔서 놀랐어요.",hl:290,vf:1},
+{pid:1015,au:"은찬",dt:"2025.11.30",sc:9,tx:"인상학의 대가. 얼굴만 보고 직업 맞추심.",hl:345,vf:1},
+{pid:1015,au:"주원",dt:"2026.01.25",sc:10,tx:"TV에서 보던 분을 직접 만나니 감동.",hl:212,vf:1},
+{pid:1016,au:"하은B",dt:"2025.12.20",sc:8,tx:"MZ 감성의 관상 풀이. 재미있고 공감됨.",hl:134,vf:1},
+{pid:1016,au:"지안",dt:"2026.02.01",sc:9,tx:"관상으로 연애 스타일을 맞추셔서 ㅋㅋ",hl:178,vf:0},
+{pid:1017,au:"하은",dt:"2025.12.25",sc:8,tx:"5천원에 이 정도면 가성비 미쳤어요!",hl:445,vf:1},
+{pid:1017,au:"태양",dt:"2025.12.30",sc:7,tx:"가볍게 재미로 보기 좋아요.",hl:56,vf:0},
+{pid:1017,au:"세아",dt:"2026.01.15",sc:8,tx:"친구들이랑 같이 보면 재밌어요!",hl:234,vf:1},
+{pid:1018,au:"은수",dt:"2025.12.15",sc:8,tx:"학생이라 부담없는 가격이 좋았어요.",hl:78,vf:1},
+{pid:1018,au:"태호",dt:"2026.01.20",sc:9,tx:"취준생인데 방향 잡는 데 도움 됐어요.",hl:112,vf:1},
+{pid:1021,au:"미래",dt:"2026.01.12",sc:8,tx:"영어로 타로 가능! 외국인 친구와 갔어요.",hl:167,vf:1},
+{pid:1022,au:"성진",dt:"2026.01.10",sc:9,tx:"풍수지리까지 봐주시니 깊이가 다릅니다.",hl:123,vf:1},
+{pid:1022,au:"현진",dt:"2025.12.28",sc:10,tx:"대기업 임원들이 찾는 이유가 있어요.",hl:267,vf:1},
+{pid:1023,au:"소영",dt:"2026.01.18",sc:10,tx:"최남단 기운. 정말 강력했어요.",hl:198,vf:1},
+{pid:1023,au:"재윤",dt:"2025.12.15",sc:9,tx:"땅끝마을 여행 중 최고의 경험.",hl:156,vf:1},
+{pid:1024,au:"은비",dt:"2025.12.20",sc:9,tx:"유교적 해석이 독특하고 새로웠어요.",hl:134,vf:1},
+{pid:1026,au:"다희",dt:"2026.01.05",sc:10,tx:"설악산 영기가 진짜인 것 같아요.",hl:278,vf:1},
+{pid:1026,au:"우빈",dt:"2025.12.10",sc:9,tx:"새벽에 설악산 올라가서 기도하신대요.",hl:189,vf:1},
+{pid:1026,au:"채린",dt:"2026.02.08",sc:10,tx:"속초 여행 하이라이트! 꼭 가보세요.",hl:145,vf:1},
+{pid:1027,au:"별이",dt:"2025.12.28",sc:8,tx:"여수 밤바다 보면서 타로. 로맨틱해요.",hl:189,vf:1},
+{pid:1028,au:"진아",dt:"2026.01.15",sc:8,tx:"무심천 옆이라 산책하다 들르기 좋아요.",hl:67,vf:1},
+{pid:1029,au:"정훈",dt:"2025.12.18",sc:9,tx:"해돋이 보고 신점 보니 기운이 확 달라요.",hl:167,vf:1},
+{pid:1029,au:"나윤",dt:"2026.01.25",sc:9,tx:"새벽 5시 오픈이라 해돋이랑 같이!",hl:134,vf:1},
+{pid:1030,au:"보미",dt:"2025.12.20",sc:7,tx:"아로마 향 좋아요. 가볍게 즐기기 좋음.",hl:56,vf:1},
+{pid:1031,au:"재혁",dt:"2026.01.15",sc:10,tx:"유달산 보살님 정말 용하세요.",hl:312,vf:1},
+{pid:1031,au:"다온",dt:"2025.12.22",sc:10,tx:"목포 여행의 진짜 목적이 여기였어요.",hl:245,vf:1},
+{pid:1032,au:"시율",dt:"2026.01.08",sc:9,tx:"신라 천년의 관상학. 독특하고 정확.",hl:156,vf:1},
+{pid:1032,au:"하람",dt:"2025.12.30",sc:8,tx:"경주 여행 중 특별한 체험. 추천!",hl:112,vf:1},
+{pid:1033,au:"동현",dt:"2025.12.25",sc:9,tx:"치악산 수행자답게 통찰력이 깊어요.",hl:145,vf:1},
+{pid:1034,au:"태우",dt:"2026.01.08",sc:7,tx:"만화 컨셉이 재밌어요. 유니크.",hl:89,vf:0},
+{pid:1035,au:"수빈B",dt:"2026.01.20",sc:9,tx:"마산 바다 기운이 느껴지는 특별 경험.",hl:187,vf:1},
+{pid:1035,au:"한결",dt:"2025.12.15",sc:8,tx:"항구 도시 신당. 분위기가 독특.",hl:98,vf:1},
+{pid:1036,au:"소담",dt:"2025.12.30",sc:8,tx:"양평 자연 속 여유로운 상담.",hl:78,vf:1},
+{pid:1037,au:"예은",dt:"2026.01.22",sc:8,tx:"온양온천 후 관상 보니 힐링 코스.",hl:112,vf:1},
+{pid:1038,au:"시후",dt:"2025.12.18",sc:8,tx:"동굴 안 타로는 여기뿐! 신비로워요.",hl:145,vf:1},
+{pid:1039,au:"서진",dt:"2026.01.28",sc:9,tx:"순천만 옆 자연 속 힐링 신점.",hl:134,vf:1},
+{pid:1039,au:"유빈",dt:"2025.12.20",sc:10,tx:"정원 보살님 너무 따뜻해요.",hl:189,vf:1},
+{pid:1040,au:"현서",dt:"2026.02.05",sc:9,tx:"분단의 기운. 영적 감각이 강렬.",hl:167,vf:1},
+{pid:1040,au:"아인",dt:"2025.12.28",sc:8,tx:"임진각 근처라 특별한 느낌.",hl:89,vf:1}
 ];
 
 // ═══ STATE ═══
@@ -249,89 +314,66 @@ let cc='all',cr='전국',cpi=0,cv='map',dk=false,li=false,lu='';
 // ═══ GOOGLE SHEETS 연동 ═══
 // 구글 시트 API URL을 여기에 입력하세요 (Apps Script 웹앱 URL 또는 Sheets API URL)
 // 비워두면 위의 기본 데이터(D)만 사용합니다.
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxLK1VNYq8NPo5fSsgumIqDkvia1fS3v8sszyVrPkVhURnGRssbCo9gz7NNg-1kd-Nu/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwwU6-h1NAYbCa6anEdw50unEeWDLnKjkrwX6sPGsCmaOFdcfeHa8-v9x1Dy0fpXfXY/exec';
 
 // 구글 시트 실제 컬럼 순서:
-// [0]:지역 [1]:업체명 [2]:전문가명 [3]:경력 [4]:상담비표시 [5]:전화
-// [6]:영업시간 [7]:휴무 [8]:주소 [9]:위도 [10]:경도 [11]:소개 [12]:태그 [13]:아이콘
-// ※ 카테고리 컬럼 추가 권장 (saju/sinjeom/tarot/gwansang)
+// [0]:고유ID [1]:지역 [2]:업체명 [3]:전문가명 [4]:경력 [5]:상담비표시 [6]:전화
+// [7]:영업시간 [8]:휴무 [9]:주소 [10]:위도 [11]:경도 [12]:소개 [13]:태그 [14]:아이콘 [15]:사진URL
 
 async function loadSheet(){
   if(!SHEET_URL)return;
   try{
-    console.log('[구글시트] 데이터 요청 중...');
     const res=await fetch(SHEET_URL);
     const text=await res.text();
-    if(text.startsWith('<!DOCTYPE')||text.startsWith('<html')){console.error('[구글시트] ❌ Apps Script 배포 설정 확인!');return;}
-    let json;try{json=JSON.parse(text);}catch(pe){console.error('[구글시트] ❌ JSON 파싱 실패');return;}
-    let rows=Array.isArray(json.data)?json.data:Array.isArray(json.values)?json.values:Array.isArray(json)?json:null;
-    if(!rows||!rows.length){console.error('[구글시트] ❌ 데이터 없음');return;}
-    
-    // 헤더 건너뛰기
+    if(!text||text.charAt(0)==='<')return;
+    const json=JSON.parse(text);
+    let rows=json.data||json.values||(Array.isArray(json)?json:null);
+    if(!Array.isArray(rows)||!rows.length)return;
+    // 첫 데이터행 찾기 (헤더 건너뛰기)
     const h=rows[0];
-    const start=(typeof h[0]==='string'&&(h[0].includes('지역')||h[0].includes('업체')||h[0].includes('상호')))?1:0;
+    const start=(typeof h[1]==='string'&&(h[1].includes('지역')||h[1].includes('업체')))||(typeof h[2]==='string'&&h[2].includes('업체'))?1:0;
+    // 컬럼 오프셋 자동감지: A열이 숫자(고유ID)면 +1 밀림
+    const firstData=rows[start];
+    const off=(typeof firstData[0]==='number'||(!isNaN(Number(firstData[0]))&&String(firstData[0]).length<5))?1:0;
+    // off=1이면: [0]고유ID [1]지역 [2]업체명 ...
+    // off=0이면: [0]지역 [1]업체명 [2]전문가명 ...
     let maxId=Math.max(...D.map(d=>d.id));
     let added=0;
-    
-    // 카테고리 자동 추론 (이름/소개/태그에서)
-    function guessCat(name,desc,tags){
-      const all=(name+' '+desc+' '+tags).toLowerCase();
-      if(all.includes('신점')||all.includes('보살')||all.includes('무당')||all.includes('신당'))return'sinjeom';
-      if(all.includes('타로')||all.includes('카드'))return'tarot';
-      if(all.includes('관상')||all.includes('얼굴')||all.includes('인상'))return'gwansang';
+    function guessCat(nm,ds,tg){
+      const a=(nm+' '+ds+' '+tg).toLowerCase();
+      if(a.includes('신점')||a.includes('보살')||a.includes('무당')||a.includes('신당'))return'sinjeom';
+      if(a.includes('타로')||a.includes('카드'))return'tarot';
+      if(a.includes('관상')||a.includes('얼굴')||a.includes('인상'))return'gwansang';
       return'saju';
     }
-    // 지역 매핑 (세부지역→필터지역)
     const rgMap={'일산':'경기','분당':'경기','수원':'경기','고양':'경기','성남':'경기','용인':'경기','파주':'경기','양평':'경기','부천':'경기','안양':'경기','화성':'경기','평택':'경기','이천':'경기','김포':'경기','하남':'경기','광명':'경기','시흥':'경기','안산':'경기','의정부':'경기','남양주':'경기','구리':'경기','세종':'대전','천안':'충남','청주':'충북','춘천':'강원','속초':'강원','강릉':'강원','원주':'강원','여수':'전남','순천':'전남','목포':'전남','해남':'전남','안동':'경북','포항':'경북','경주':'경북','김해':'경남','창원':'경남','진주':'경남','통영':'경남','종로':'서울','강남':'서울','마포':'서울','홍대':'서울','이태원':'서울','용산':'서울','서면':'부산','해운대':'부산'};
-    
     for(let i=start;i<rows.length;i++){
-      const r=rows[i];if(!r||!r[1])continue; // [1]이 업체명
-      maxId++;added++;
-      const rawTags=String(r[12]||'').replace(/#/g,'').replace(/\s+/g,',');
+      const r=rows[i];if(!r||!r[off+1])continue;
+      const sheetId=off?parseInt(r[0])||0:0;
+      const itemId=sheetId||(++maxId);
+      if(sheetId)maxId=Math.max(maxId,sheetId);
+      added++;
+      const O=off; // 오프셋 약자
+      const rawTags=String(r[O+12]||'').replace(/#/g,'').replace(/\s+/g,',');
       const tags=rawTags.split(',').map(t=>t.trim()).filter(Boolean);
-      const name=String(r[1]||'');
-      const desc=String(r[11]||'');
-      const cat=guessCat(name,desc,String(r[12]||''));
-      const prStr=String(r[4]||'5만원');
+      const name=String(r[O+1]||'');
+      const desc=String(r[O+11]||'');
+      const cat=guessCat(name,desc,String(r[O+12]||''));
+      const prStr=String(r[O+4]||'5만원');
       const prNum=parseInt(prStr.replace(/[^0-9]/g,''))||50000;
-      // 상담비 숫자 변환: "7만원"→70000, "3만원"→30000
       const prFinal=prNum<1000?prNum*10000:prNum;
-      
-      const rawRg=String(r[0]||'서울');
+      const rawRg=String(r[O+0]||'서울');
       const mappedRg=rgMap[rawRg]||rawRg;
-      
-      const item={
-        id:maxId,
-        n:name,
-        cat:cat,
-        rg:mappedRg,
-        lat:parseFloat(r[9])||37.5,
-        lng:parseFloat(r[10])||127.0,
-        addr:String(r[8]||''),
-        rt:8.0, rv:0,
-        pr:prFinal,
-        prl:prStr,
-        sp:String(r[2]||''),
-        exp:String(r[3]||''),
-        desc:desc,
-        tags:tags.length?tags:['점술'],
-        ph:String(r[5]||'-'),
-        hrs:String(r[6]||'10:00-18:00'),
-        cls:String(r[7]||'일요일'),
-        ic:String(r[13]||'🔮'),
-        vf:0,photos:[]
-      };
-      D.push(item);
-      console.log('[구글시트] ✅',item.n,'('+item.cat+') @'+item.rg,'lat:'+item.lat,'lng:'+item.lng);
+      D.push({id:itemId,n:name,cat:cat,rg:mappedRg,lat:parseFloat(r[O+9])||37.5,lng:parseFloat(r[O+10])||127.0,addr:String(r[O+8]||''),rt:8.0,rv:0,pr:prFinal,prl:prStr,sp:String(r[O+2]||''),exp:String(r[O+3]||''),desc:desc,tags:tags.length?tags:['점술'],ph:String(r[O+5]||'-'),hrs:String(r[O+6]||'10:00-18:00'),cls:String(r[O+7]||'일요일'),ic:String(r[O+13]||'🔮'),vf:0,photos:(r[O+14]&&String(r[O+14]).startsWith('http'))?String(r[O+14]).split(',').map(u=>u.trim()).filter(Boolean):[]});
+      console.log('[업체] ✅ #'+itemId,name,'@'+mappedRg);
     }
-    console.log('[구글시트] 🎉 '+added+'개 업체 추가! 전체:',D.length);
+    console.log('[업체] 🎉 '+added+'개 추가, 전체:'+D.length);
     rfilt();rmap();
-  }catch(e){console.error('[구글시트] ❌',e.message);}
+  }catch(e){console.error('[업체]',e);}
 }
-loadSheet(); // 앱 시작 시 자동 로드
-let fav=[1,5,3];
-let res=[{id:"R1001",pid:1,n:"천운당",dt:"2026-02-15",tm:"14:00",pr:"6만원",st:"completed"}];
-let pay=[{id:"P1001",n:"천운당",dt:"2026-02-10",pr:"6만원",mt:"간편결제",pid:1}];
+let fav=[1001,1005,1003];
+let res=[{id:"R1001",pid:1001,n:"천운당",dt:"2026-02-15",tm:"14:00",pr:"6만원",st:"completed"}];
+let pay=[{id:"P1001",n:"천운당",dt:"2026-02-10",pr:"6만원",mt:"간편결제",pid:1001}];
 let myRv=[];
 let cp2=null,mm='detail',cvm=new Date(),csel=null,btm=null,rvScore=0,rvSort='popular',payMethod='card';
 let sh=["천운당","관상","부산 신점"];
@@ -352,7 +394,7 @@ const $=id=>document.getElementById(id);
 const cbg=c=>dk?CT[c].db:CT[c].bg;
 const st=(s,z=12)=>[1,2,3,4,5].map(i=>`<span class="${i<=Math.round(s/2)?'st':'sto'}" style="font-size:${z}px">★</span>`).join('');
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800);}
-function gf(q){const pf=PR[cpi];return D.filter(p=>{if(cc!=='all'&&p.cat!==cc)return!1;if(cr!=='전국'&&p.rg!==cr)return!1;if(p.pr<pf.a||p.pr>=pf.b)return!1;if(q&&!p.n.includes(q)&&!p.addr.includes(q)&&!p.sp.includes(q)&&!CT[p.cat].l.includes(q))return!1;return!0;}).sort((a,b)=>b.rt-a.rt);}
+function gf(q){const pf=PR[cpi];return D.filter(p=>{if(cc!=='all'&&p.cat!==cc)return!1;if(cr!=='전국'&&p.rg!==cr)return!1;if(p.pr<pf.a||p.pr>=pf.b)return!1;if(q&&!p.n.includes(q)&&!p.addr.includes(q)&&!p.sp.includes(q)&&!CT[p.cat].l.includes(q)&&!(p.tags&&p.tags.some(t=>t.includes(q)))&&!(p.desc&&p.desc.includes(q)))return!1;return!0;}).sort((a,b)=>b.rt-a.rt);}
 
 // ═══ DARK MODE ═══
 $('thm').onclick=()=>{dk=!dk;$('app').dataset.theme=dk?'dark':'light';$('thm').textContent=dk?'☀️':'🌙';rmap();};
@@ -609,8 +651,114 @@ function payNg(rsp){
   $('mfoot').innerHTML=`<button class="btn btn-o" style="flex:1" onclick="mm='booking';rmod()">다시 시도</button><button class="btn btn-b" style="flex:1" onclick="closeM()">닫기</button>`;
 }
 
+// ═══ 홍보 광고 데이터 ═══
+// 구글 시트 광고 API URL (별도 시트)
+const AD_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxc2Tvfh8yN47cY3MbW_kVEUsMczBQknlSmy5znK1gYXgLT6TJEyXSv_eaATJyV2ZKCZg/exec';
+
+const ADS=[
+{n:"천운당",cat:"saju",rg:"서울 종로구",desc:"3대째 이어온 전통 사주 명가. 이직·사업운 정확도 최고",pr:"6만원",ic:"🏛️",img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop",lid:1001},
+{n:"해운보살",cat:"sinjeom",rg:"부산 해운대",desc:"부산 45년 전설의 신점. 전국에서 찾아오는 이유가 있습니다",pr:"8만원",ic:"🌊",img:"https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=200&fit=crop",lid:1005},
+{n:"달빛타로",cat:"tarot",rg:"서울 홍대",desc:"홍대 감성 공간에서 연애운·진로 타로 리딩",pr:"3만원",ic:"🌙",img:"https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=300&h=200&fit=crop",lid:1004},
+{n:"종로 백운관상",cat:"gwansang",rg:"서울 종로구",desc:"TV 출연 관상 명인. 얼굴만 보고 직업·성격 적중",pr:"5만원",ic:"🎭",img:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop",lid:1015},
+{n:"제주 해신당",cat:"sinjeom",rg:"제주 한림읍",desc:"제주 바다의 기운을 받은 신비로운 신점 체험",pr:"7만원",ic:"🏝️",img:"https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=300&h=200&fit=crop",lid:1009}
+];
+
+let adOpen=false,adIdx=0;
+
+// 광고 순서 랜덤 셔플
+for(let i=ADS.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ADS[i],ADS[j]]=[ADS[j],ADS[i]];}
+
+// 광고 구글시트 로드
+async function loadAdSheet(){
+  if(!AD_SHEET_URL)return;
+  try{
+    const res=await fetch(AD_SHEET_URL);const text=await res.text();
+    if(!text||text.charAt(0)==='<')return;
+    const json=JSON.parse(text);
+    const rows=json.data||json.values||(Array.isArray(json)?json:null);
+    if(!Array.isArray(rows)||!rows.length)return;
+    // 헤더 감지
+    const h0=String(rows[0][0]||'');
+    const start=(h0.includes('연결')||h0.includes('업체')||h0.includes('ID'))?1:0;
+    // 실제 시트 구조: [0]연결ID [1]업체명 [2]카테고리 [3]위치 [4]소개 [5]사진
+    console.log('[광고] 행수:'+rows.length, '헤더:'+(start?'있음':'없음'));
+    if(rows.length>start)console.log('[광고] 데이터1행:', JSON.stringify(rows[start]).substring(0,200));
+    for(let i=start;i<rows.length;i++){
+      const r=rows[i];
+      const nm=String(r[1]||'').trim(); // B열=업체명
+      if(!nm)continue;
+      if(ADS.some(a=>a.n===nm))continue;
+      const lid=parseInt(r[0])||0;       // A열=연결ID
+      const catRaw=String(r[2]||'saju'); // C열=카테고리
+      const cat=catRaw.includes('신점')?'sinjeom':catRaw.includes('타로')?'tarot':catRaw.includes('관상')?'gwansang':'saju';
+      const rg=String(r[3]||'');         // D열=위치
+      const desc=String(r[4]||'');       // E열=소개
+      const img=String(r[5]||'');        // F열=사진
+      ADS.push({n:nm,cat:cat,rg:rg,desc:desc,pr:'',ic:'🔮',img:img,lid:lid});
+      console.log('[광고] ✅',nm,'lid:'+lid,'cat:'+cat);
+    }
+    console.log('[광고] 총 '+ADS.length+'개 광고');
+    for(let i=ADS.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ADS[i],ADS[j]]=[ADS[j],ADS[i]];}
+    renderAdPeek();renderAdFull();
+  }catch(e){console.warn('[광고]',e.message);}
+}
+
+function renderAdPeek(){
+  const ad=ADS[adIdx%ADS.length];if(!ad)return;
+  const c=CT[ad.cat]||CT.saju;
+  $('adPeekInner').innerHTML=`<img class="ad-peek-img" src="${ad.img}" alt="" onerror="this.style.display='none'"><div class="ad-peek-info"><div class="ad-peek-name">${ad.ic} ${ad.n} <span class="ad-badge">AD</span></div><div class="ad-peek-loc">📍 ${ad.rg}</div><div class="ad-peek-desc">${ad.desc}</div></div>`;
+}
+
+function renderAdFull(){
+  $('adFull').innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-top:4px"><span style="font-size:15px;font-weight:800;color:var(--tx)">📢 신당 홍보하기</span><span style="font-size:10px;color:var(--mu)">AD · 광고</span></div>`+ADS.map((ad,i)=>{
+    const c=CT[ad.cat]||CT.saju;
+    return`<div class="ad-card" onclick="adClick(${i})"><img class="ad-card-img" src="${ad.img}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22><rect fill=%22%23E2E8F0%22 width=%2264%22 height=%2264%22 rx=%2210%22/><text x=%2232%22 y=%2238%22 text-anchor=%22middle%22 font-size=%2226%22>${ad.ic}</text></svg>'"><div class="ad-card-body"><div class="ad-card-name">${ad.ic} ${ad.n} <span class="ad-card-cat" style="background:${c.bg};color:${c.c}">${c.l}</span></div><div class="ad-card-loc">📍 ${ad.rg}</div><div class="ad-card-desc">${ad.desc}</div></div></div>`;
+  }).join('');
+}
+
+window.toggleAd=function(){
+  adOpen=!adOpen;
+  $('adPanel').classList.toggle('open',adOpen);
+};
+
+window.adClick=function(idx){
+  adOpen=false;$('adPanel').classList.remove('open');
+  const ad=ADS[idx];
+  if(!ad){toast('광고 정보 오류');return;}
+  console.log('[adClick] 클릭:', ad.n, 'lid:', ad.lid, 'idx:', idx);
+  console.log('[adClick] D배열 id 목록:', D.map(d=>d.id+':'+d.n).join(', '));
+  // 1) 연결ID로 찾기
+  if(ad.lid>0){
+    const f=D.find(d=>d.id===ad.lid);
+    if(f){console.log('[adClick] ✅ lid매칭:', f.n);openD(f.id);return;}
+    // 숫자 타입 불일치 대비 (문자열 vs 숫자)
+    const f1b=D.find(d=>String(d.id)===String(ad.lid));
+    if(f1b){console.log('[adClick] ✅ lid문자열매칭:', f1b.n);openD(f1b.id);return;}
+    console.log('[adClick] ⚠️ lid='+ad.lid+' 매칭 실패');
+  }
+  // 2) 업체명 완전일치
+  const f2=D.find(d=>d.n===ad.n);
+  if(f2){console.log('[adClick] ✅ 이름매칭:', f2.n);openD(f2.id);return;}
+  // 3) 부분 이름 매칭
+  const f3=D.find(d=>d.n.includes(ad.n)||ad.n.includes(d.n));
+  if(f3){console.log('[adClick] ✅ 부분매칭:', f3.n);openD(f3.id);return;}
+  console.log('[adClick] ❌ 매칭 실패. ad:', JSON.stringify(ad));
+  toast('업체 상세정보를 찾을 수 없습니다');
+};
+
+// 미리보기 자동 롤링 (8초마다)
+setInterval(()=>{if(!adOpen){adIdx++;renderAdPeek();}},8000);
+
+renderAdPeek();renderAdFull();
+
 // ═══ INIT ═══
 rfilt();rmap();rnav();
+(async function(){
+  await loadSheet();
+  await loadAdSheet();
+  // 스플래시 숨기기 (최소 1.2초 보여주기)
+  setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hide');},1200);
+})();
 </script>
 </body>
 </html>
